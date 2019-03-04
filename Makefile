@@ -1,8 +1,8 @@
 
-all: clean test5
+all: clean sim
 
-test5: main.cpp
-	g++ -std=c++11 -Wall -o sim1 main.cpp
+sim: main.cpp
+	g++ -std=c++11 -Wall -o sim2 main.cpp
 
 clean:
-	rm -f sim1
+	rm -f sim2
