@@ -1,4 +1,4 @@
-# OS Simulator - Assignment 1
+# OS Simulator
 
 This program runs from the terminal and takes one argument for the filename of the configuration file to be used to initialize the OS simulator. This config file contains the filename of a meta data file for use in loading the operations to perform in the OS simulator.
 
