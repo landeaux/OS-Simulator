@@ -6,6 +6,10 @@
  *
  * @details This program is the driver program for OS Simulator classes
  *
+ * @version 1.06
+ *          Adam Landis (6 March 2019)
+ *          Add PCB class            
+ *
  * @version 1.05
  *          Adam Landis (18 February 2019)
  *          Add logging functionality for config data and metadata and
@@ -54,6 +58,8 @@
 #include <map>
 #include <queue>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 
 #include "PCB.h"
 //
@@ -152,6 +158,9 @@ configSetting getConfigSetting(const std::string& descriptor, configMap config);
 //
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
+    PCB pcb;
+
     try
     {
         if (argc == 1)
