@@ -150,6 +150,8 @@ void validateMetadataDescriptor(const std::string& descriptor);
 void validateMetadataCycles(const std::string& numCycles);
 void logMetadataFileData(const MetadataInstruction& instr, configMap config);
 std::string generateMetadataLogData(MetadataInstruction instr, const configMap& config);
+
+void startSimulation(configMap config, metadataQueue mdQueue);
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -183,6 +185,8 @@ int main(int argc, char *argv[])
             throw std::string("Error: 'File Path' missing from config file");
         }
         metaQueue = initializeMetadata(metadataFilename, config);
+
+        startSimulation(config, metaQueue);
     }
     catch (std::string& e)
     {
@@ -968,4 +972,21 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
     }
 
     return result;
+}
+
+/**
+ * @brief      Starts the OS simulation.
+ *
+ * @param[in]  config   The configuration map
+ * @param[in]  mdQueue  The queue of metadata instructions
+ */
+void startSimulation(configMap config, metadataQueue mdQueue)
+{
+    std::cout << std::endl;
+    while(!mdQueue.empty())
+    {
+        MetadataInstruction instr = mdQueue.front();
+        mdQueue.pop();
+        std::cout << instr.toString() << std::endl;
+    }
 }
