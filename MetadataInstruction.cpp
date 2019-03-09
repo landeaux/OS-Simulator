@@ -81,3 +81,13 @@ const unsigned long MetadataInstruction::getNumCycles() const
 {
     return this->numCycles;
 }
+
+/**
+ * @brief      Returns a string representation of the object.
+ *
+ * @return     String representation of the object.
+ */
+const std::string toString() const
+{
+    return "";
+}

@@ -32,6 +32,7 @@ public:
     const char getCode() const;
     const std::string getDescriptor() const;
     const unsigned long getNumCycles() const;
+    const std::string toString() const;
 private:
     char code;
     std::string descriptor;
