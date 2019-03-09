@@ -519,13 +519,14 @@ std::string generateConfigLogData(configMap config)
     std::string logData;
 
     logData += "Configuration File Data\n";
-    logData += "Monitor = "     + config["Monitor"]     + " ms/cycle\n";
-    logData += "Processor = "   + config["Processor"]   + " ms/cycle\n";
-    logData += "Scanner = "     + config["Scanner"]     + " ms/cycle\n";
-    logData += "Hard Drive = "  + config["Hard drive"]  + " ms/cycle\n";
-    logData += "Keyboard = "    + config["Keyboard"]    + " ms/cycle\n";
-    logData += "Memory = "      + config["Memory"]      + " ms/cycle\n";
-    logData += "Projector = "   + config["Projector"]   + " ms/cycle\n";
+    logData += "Monitor = "       + config["Monitor"]       + " ms/cycle\n";
+    logData += "Processor = "     + config["Processor"]     + " ms/cycle\n";
+    logData += "Scanner = "       + config["Scanner"]       + " ms/cycle\n";
+    logData += "Hard Drive = "    + config["Hard drive"]    + " ms/cycle\n";
+    logData += "Keyboard = "      + config["Keyboard"]      + " ms/cycle\n";
+    logData += "Memory = "        + config["Memory"]        + " ms/cycle\n";
+    logData += "Projector = "     + config["Projector"]     + " ms/cycle\n";
+    logData += "System memory = " + config["System memory"] + " kbytes\n";
 
     logData += "Logged to: ";
     if (config["Log"] == "Log to Both") logData += "monitor and ";
@@ -544,24 +545,27 @@ std::string generateConfigLogData(configMap config)
  */
 std::string getShortConfigSettingName(const std::string& longStr)
 {
+    std::string result = longStr;
+
     if (longStr != "Version/Phase" &&
         longStr != "File Path" &&
         longStr != "Log" &&
         longStr != "Log File Path")
     {
-        std::string shortStr;
         size_t end = longStr.find(' ');
-        shortStr = longStr.substr(0, end);
-        if (shortStr == "Hard")
+        result = longStr.substr(0, end);
+        
+        if (result == "Hard")
         {
-            shortStr += " drive";
+            result += " drive";
         }
-        return shortStr;
+        else if (result == "System")
+        {
+            result += " memory";
+        }
     }
-    else
-    {
-        return longStr;
-    }
+    
+    return result;
 }
 
 /**
