@@ -91,14 +91,11 @@ const std::string MetadataInstruction::toString() const
 {
     std::string result;
 
-    if (this->numCycles > 0)
-    {
-        std::string code = std::string(1, this->code);
-        std::string descriptor = this->descriptor;
-        std::string numCycles = std::to_string(this->numCycles);
+    std::string code = std::string(1, this->code);
+    std::string descriptor = this->descriptor;
+    std::string numCycles = std::to_string(this->numCycles);
 
-        result = code + "{" + descriptor + "}" + numCycles;
-    }
+    result = code + "{" + descriptor + "}" + numCycles;
 
     return result;
 }
