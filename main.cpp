@@ -136,6 +136,7 @@ configSetting parseConfigLine(const std::string& configLine);
 void logConfigFileData(configMap config);
 std::string generateConfigLogData(configMap config);
 std::string getShortConfigSettingName(const std::string& longStr);
+configSetting getConfigSetting(const std::string& descriptor, configMap config);
 
 void logToMonitor(std::string& logData);
 void logToFile(std::string& logData, std::string& logFilename,
@@ -150,7 +151,6 @@ void validateMetadataDescriptor(const std::string& descriptor);
 void validateMetadataCycles(const std::string& numCycles);
 void logMetadataFileData(const MetadataInstruction& instr, configMap config);
 std::string generateMetadataLogData(MetadataInstruction instr, const configMap& config);
-configSetting getConfigSetting(const std::string& descriptor, configMap config);
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -918,17 +918,12 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
 
     if (instr.getNumCycles() > 0)
     {
-        std::string code = std::string(1, instr.getCode());
-        std::string descriptor = instr.getDescriptor();
-        std::string numCycles = std::to_string(instr.getNumCycles());
-
-        configSetting setting = getConfigSetting(descriptor, config);
+        configSetting setting = getConfigSetting(instr.getDescriptor(), config);
 
         unsigned long cycleTime = strToUnsignedLong(setting.value);
         std::string totalTime = std::to_string(instr.getNumCycles() * cycleTime);
 
-        result = code + "{" + descriptor + "}" + numCycles +
-                " - " + totalTime + " ms\n";
+        result = instr.toString() + " - " + totalTime + " ms\n";
     }
 
     return result;
