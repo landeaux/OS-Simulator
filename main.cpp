@@ -131,6 +131,7 @@ unsigned long strToUnsignedLong(const std::string& str);
 void logToMonitor(std::string& logData);
 void logToFile(std::string& logData, std::string& logFilename,
                std::ios_base::openmode mode = std::ios_base::out);
+void logData(configMap config, std::string data);
 
 configMap initializeConfig(const std::string& filename);
 void validateConfigFile(std::ifstream& configFile, const std::string& filename);
@@ -152,6 +153,7 @@ void logMetadataFileData(const MetadataInstruction& instr, configMap config);
 std::string generateMetadataLogData(MetadataInstruction instr, const configMap& config);
 
 void startSimulation(configMap config, metadataQueue mdQueue);
+void executeInstruction(MetadataInstruction instr);
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -363,6 +365,33 @@ void logToFile(std::string& logData, std::string& logFilename,
 }
 
 /**
+ * @brief      Logs a single string of data either to a file, monitor, or both
+ *
+ * @param[in]  config  The configuration
+ * @param[in]  data    The data
+ */
+void logData(configMap config, std::string data)
+{
+    if (config["Log"] == "Log to Monitor")
+    {
+        logToMonitor(data);
+    }
+    else if (config["Log"] == "Log to File")
+    {
+        logToFile(data, config["Log File Path"]);
+    }
+    else if (config["Log"] == "Log to Both")
+    {
+        logToMonitor(data);
+        logToFile(data, config["Log File Path"]);
+    }
+    else
+    {
+        throw std::string("Error: cannot log data - invalid or missing log type");
+    }
+}
+
+/**
  * @brief   Function to initialize OS Configuration
  *
  * @detail  Opens specified config file, validates the file, and parses the file
@@ -534,25 +563,9 @@ configSetting parseConfigLine(const std::string& configLine)
  */
 void logConfigFileData(configMap config)
 {
-    std::string logData = generateConfigLogData(config);
+    std::string data = generateConfigLogData(config);
 
-    if (config["Log"] == "Log to Monitor")
-    {
-        logToMonitor(logData);
-    }
-    else if (config["Log"] == "Log to File")
-    {
-        logToFile(logData, config["Log File Path"]);
-    }
-    else if (config["Log"] == "Log to Both")
-    {
-        logToMonitor(logData);
-        logToFile(logData, config["Log File Path"]);
-    }
-    else
-    {
-        throw std::string("Error: cannot log data - invalid or missing log type");
-    }
+    logData(config, data);
 }
 
 /**
