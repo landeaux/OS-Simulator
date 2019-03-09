@@ -128,6 +128,9 @@ bool isPositiveInteger(const std::string& str);
 bool isNonNegativeInteger(const std::string& str);
 std::string stripSpaces(const std::string& s);
 unsigned long strToUnsignedLong(const std::string& str);
+void logToMonitor(std::string& logData);
+void logToFile(std::string& logData, std::string& logFilename,
+               std::ios_base::openmode mode = std::ios_base::out);
 
 configMap initializeConfig(const std::string& filename);
 void validateConfigFile(std::ifstream& configFile, const std::string& filename);
@@ -137,10 +140,6 @@ void logConfigFileData(configMap config);
 std::string generateConfigLogData(configMap config);
 std::string getShortConfigSettingName(const std::string& longStr);
 configSetting getConfigSetting(const std::string& descriptor, configMap config);
-
-void logToMonitor(std::string& logData);
-void logToFile(std::string& logData, std::string& logFilename,
-               std::ios_base::openmode mode = std::ios_base::out);
 
 metadataQueue initializeMetadata(const std::string& filename, const configMap& config);
 void validateMetadataFile(std::ifstream& metadataFile, const std::string& filename);
@@ -310,6 +309,53 @@ std::string stripSpaces(const std::string& str)
 unsigned long strToUnsignedLong(const std::string& str)
 {
     return (unsigned long) strtol(str.c_str(), nullptr, 10);
+}
+
+/**
+ * Logs data to monitor (terminal)
+ *
+ * @param   logData
+ *          The data to log to monitor (string)
+ */
+void logToMonitor(std::string& logData)
+{
+    std::cout << logData;
+}
+
+/**
+ * Logs data to an output file
+ *
+ * @param   logData
+ *          The data to log to file (string)
+ *
+ * @param   logFile
+ *          The filename of the file to log the output to (string)
+ *
+ * @param   mode
+ *          The openmode for the file. Default: ios_base::out
+ *
+ * @return  None
+ */
+void logToFile(std::string& logData, std::string& logFilename,
+               std::ios_base::openmode mode)
+{
+    std::ofstream logFile;
+
+    if (logFilename.empty())
+    {
+        throw std::string("Error: cannot log to file - filename missing");
+    }
+
+    logFile.open(logFilename, mode);
+
+    if (!logFile)
+    {
+        throw std::string("Error: cannot log to file - unable to open log file");
+    }
+
+    logFile << logData;
+
+    logFile.close();
 }
 
 /**
@@ -569,50 +615,41 @@ std::string getShortConfigSettingName(const std::string& longStr)
 }
 
 /**
- * Logs data to monitor (terminal)
+ * Gets the config setting for a given metadata instruction descriptor
  *
- * @param   logData
- *          The data to log to monitor (string)
+ * @param   descriptor
+ *          The given metadata instruction descriptor to find the config setting
+ *          for
+ *
+ * @param   config
+ *          configMap object which holds all of the configuration settings
+ *
+ * @return  The config setting which corresponds to the given metadata
+ *          instruction descriptor (configSetting)
  */
-void logToMonitor(std::string& logData)
+configSetting getConfigSetting(const std::string& descriptor, configMap config)
 {
-    std::cout << logData;
-}
+    configSetting setting;
 
-/**
- * Logs data to an output file
- *
- * @param   logData
- *          The data to log to file (string)
- *
- * @param   logFile
- *          The filename of the file to log the output to (string)
- *
- * @param   mode
- *          The openmode for the file. Default: ios_base::out
- *
- * @return  None
- */
-void logToFile(std::string& logData, std::string& logFilename,
-               std::ios_base::openmode mode)
-{
-    std::ofstream logFile;
-
-    if (logFilename.empty())
+    if (descriptor == "block" || descriptor == "allocate")
     {
-        throw std::string("Error: cannot log to file - filename missing");
+        setting.key = "Memory";
+        setting.value = config["Memory"];
+    }
+    else if (descriptor == "run")
+    {
+        setting.key = "Processor";
+        setting.value = config["Processor"];
+    }
+    else
+    {
+        std::string key = descriptor;
+        key[0] = (char) toupper(key[0]);
+        setting.key = key;
+        setting.value = config[key];
     }
 
-    logFile.open(logFilename, mode);
-
-    if (!logFile)
-    {
-        throw std::string("Error: cannot log to file - unable to open log file");
-    }
-
-    logFile << logData;
-
-    logFile.close();
+    return setting;
 }
 
 /**
@@ -931,42 +968,4 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
     }
 
     return result;
-}
-
-/**
- * Gets the config setting for a given metadata instruction descriptor
- *
- * @param   descriptor
- *          The given metadata instruction descriptor to find the config setting
- *          for
- *
- * @param   config
- *          configMap object which holds all of the configuration settings
- *
- * @return  The config setting which corresponds to the given metadata
- *          instruction descriptor (configSetting)
- */
-configSetting getConfigSetting(const std::string& descriptor, configMap config)
-{
-    configSetting setting;
-
-    if (descriptor == "block" || descriptor == "allocate")
-    {
-        setting.key = "Memory";
-        setting.value = config["Memory"];
-    }
-    else if (descriptor == "run")
-    {
-        setting.key = "Processor";
-        setting.value = config["Processor"];
-    }
-    else
-    {
-        std::string key = descriptor;
-        key[0] = (char) toupper(key[0]);
-        setting.key = key;
-        setting.value = config[key];
-    }
-
-    return setting;
 }
