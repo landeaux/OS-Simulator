@@ -6,7 +6,13 @@
  *
  * @details This program is the driver program for OS Simulator classes
  *
- * @version 1.06
+ * @version 2.02
+ *          Adam Landis (9 March 2019)
+ *          Add MetadataInstruction Class and remove metadataInstruction struct.
+ *          Modify implementation of functions which used struct to use class 
+ *          instead.
+ *
+ * @version 2.01
  *          Adam Landis (6 March 2019)
  *          Add PCB class            
  *
@@ -62,6 +68,7 @@
 #include <ctime>
 
 #include "PCB.h"
+#include "MetadataInstruction.h"
 //
 // Global Constant Definitions /////////////////////////////////////////////////
 //
@@ -77,6 +84,7 @@ const std::string CONFIG_SETTING_NAMES[] = {
         "Keyboard cycle time {msec}",
         "Memory cycle time {msec}",
         "Projector cycle time {msec}",
+        "System memory {kbytes}",
         "Log",
         "Log File Path"
 };
@@ -106,21 +114,11 @@ struct configSetting
     std::string key;
     std::string value;
 };
-
-/**
- * Struct to hold a single metadata instruction
- */
-struct metadataInstruction
-{
-    char code;
-    std::string descriptor;
-    unsigned long numCycles;
-};
 //
 // Typedefs ////////////////////////////////////////////////////////////////////
 //
 typedef std::map<std::string, std::string> configMap;
-typedef std::queue<metadataInstruction> metadataQueue;
+typedef std::queue<MetadataInstruction> metadataQueue;
 //
 // Free Function Prototypes ////////////////////////////////////////////////////
 //
@@ -146,12 +144,12 @@ void logToFile(std::string& logData, std::string& logFilename,
 metadataQueue initializeMetadata(const std::string& filename, const configMap& config);
 void validateMetadataFile(std::ifstream& metadataFile, const std::string& filename);
 metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& config);
-metadataInstruction parseMetadataInstruction(std::string& instructionStr);
+MetadataInstruction parseMetadataInstruction(std::string& instructionStr);
 void validateMetadataCode(const char& code);
 void validateMetadataDescriptor(const std::string& descriptor);
 void validateMetadataCycles(const std::string& numCycles);
-void logMetadataFileData(const metadataInstruction& instr, configMap config);
-std::string generateMetadataLogData(metadataInstruction instr, const configMap& config);
+void logMetadataFileData(const MetadataInstruction& instr, configMap config);
+std::string generateMetadataLogData(MetadataInstruction instr, const configMap& config);
 configSetting getConfigSetting(const std::string& descriptor, configMap config);
 //
 // Main Function Implementation ////////////////////////////////////////////////
@@ -688,7 +686,6 @@ void validateMetadataFile(std::ifstream& metadataFile, const std::string& filena
 metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& config)
 {
     metadataQueue metaQueue;
-    metadataInstruction instruction;
     std::string tempLine;
     std::string tempInstr;
     bool isLastLine = false;
@@ -724,12 +721,12 @@ metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& co
 
                 tempInstr = tempLine.substr(start, end - start);
 
-                instruction = parseMetadataInstruction(tempInstr);
+                MetadataInstruction instr = parseMetadataInstruction(tempInstr);
 
                 // logging happens here
-                logMetadataFileData(instruction, config);
+                logMetadataFileData(instr, config);
 
-                metaQueue.push(instruction);
+                metaQueue.push(instr);
                 start = end + 1;
             } while (end != std::string::npos && start < tempLine.length());
         }
@@ -747,19 +744,17 @@ metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& co
  *
  * @return  the parsed metadata instruction
  */
-metadataInstruction parseMetadataInstruction(std::string& instructionStr)
+MetadataInstruction parseMetadataInstruction(std::string& instructionStr)
 {
     unsigned long i = 0;
     unsigned long instrLen = instructionStr.length();
 
-    metadataInstruction instruction;
     char code;
     std::string descriptor;
     std::string numCycles;
 
     code = instructionStr[i];
     validateMetadataCode(code);
-    instruction.code = code;
 
     while (instructionStr[++i] == ' ' && i < instrLen);
 
@@ -780,15 +775,13 @@ metadataInstruction parseMetadataInstruction(std::string& instructionStr)
     descriptor = instructionStr.substr(i, j - i);
     if (descriptor == "harddrive") descriptor = "hard drive";
     validateMetadataDescriptor(descriptor);
-    instruction.descriptor = descriptor;
 
     i = j + 1;
 
     numCycles = instructionStr.substr(i, instrLen - i);
     validateMetadataCycles(numCycles);
-    instruction.numCycles = strToUnsignedLong(numCycles);
 
-    return instruction;
+    return MetadataInstruction(code, descriptor, strToUnsignedLong(numCycles));
 }
 
 /**
@@ -874,7 +867,7 @@ void validateMetadataCycles(const std::string& numCycles)
  *
  * @return  None
  */
-void logMetadataFileData(const metadataInstruction& instr, configMap config)
+void logMetadataFileData(const MetadataInstruction& instr, configMap config)
 {
     static bool beginLog = false;
     std::string logData;
@@ -919,20 +912,20 @@ void logMetadataFileData(const metadataInstruction& instr, configMap config)
  *
  * @return  the generated metadata log string
  */
-std::string generateMetadataLogData(metadataInstruction instr, const configMap& config)
+std::string generateMetadataLogData(MetadataInstruction instr, const configMap& config)
 {
     std::string result;
 
-    if (instr.numCycles > 0)
+    if (instr.getNumCycles() > 0)
     {
-        std::string code = std::string(1, instr.code);
-        std::string descriptor = instr.descriptor;
-        std::string numCycles = std::to_string(instr.numCycles);
+        std::string code = std::string(1, instr.getCode());
+        std::string descriptor = instr.getDescriptor();
+        std::string numCycles = std::to_string(instr.getNumCycles());
 
         configSetting setting = getConfigSetting(descriptor, config);
 
         unsigned long cycleTime = strToUnsignedLong(setting.value);
-        std::string totalTime = std::to_string(instr.numCycles * cycleTime);
+        std::string totalTime = std::to_string(instr.getNumCycles() * cycleTime);
 
         result = code + "{" + descriptor + "}" + numCycles +
                 " - " + totalTime + " ms\n";
