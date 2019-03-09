@@ -130,7 +130,7 @@ std::string stripSpaces(const std::string& s);
 unsigned long strToUnsignedLong(const std::string& str);
 void logToMonitor(std::string& logData);
 void logToFile(std::string& logData, std::string& logFilename,
-               std::ios_base::openmode mode = std::ios_base::out);
+               std::ios_base::openmode mode = std::ios_base::app);
 void logData(configMap config, std::string data);
 
 configMap initializeConfig(const std::string& filename);
@@ -1000,6 +1000,6 @@ void startSimulation(configMap config, metadataQueue mdQueue)
     {
         MetadataInstruction instr = mdQueue.front();
         mdQueue.pop();
-        std::cout << instr.toString() << std::endl;
+        logData(config, instr.toString() + "\n");
     }
 }
