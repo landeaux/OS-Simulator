@@ -59,6 +59,7 @@
 // Header Files ////////////////////////////////////////////////////////////////
 //
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include <map>
@@ -153,7 +154,7 @@ void logMetadataFileData(const MetadataInstruction& instr, configMap config);
 std::string generateMetadataLogData(MetadataInstruction instr, const configMap& config);
 
 void startSimulation(configMap config, metadataQueue mdQueue);
-void executeInstruction(MetadataInstruction instr);
+clock_t wait(clock_t &t, double duration);
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -995,11 +996,42 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
  */
 void startSimulation(configMap config, metadataQueue mdQueue)
 {
-    std::cout << std::endl;
+    logData(config, "\n");
+    clock_t t = clock();
+
+    std::cout << std::setprecision(6) << std::fixed;
+
     while(!mdQueue.empty())
     {
         MetadataInstruction instr = mdQueue.front();
         mdQueue.pop();
-        logData(config, instr.toString() + "\n");
+
+        t = wait(t, 500);
+        std::string data = std::to_string(((double)t)/CLOCKS_PER_SEC) + " - " + instr.toString() + "\n";
+        logData(config, data);
     }
+}
+
+/**
+ * @brief      Simple timer function that waits a specified duration in msec
+ * 
+ * @param      t         The clock object  
+ * @param[in]  duration  The duration to wait (in msec)
+ *
+ * @return     The updated clock object
+ * 
+ * @note       Requires ctime
+ */
+clock_t wait(clock_t &t, double duration)
+{
+    t = clock();
+    double elapsed = 0;
+
+    while(elapsed < duration)
+    {
+        t = clock() - t;
+        elapsed = (((double)t)/CLOCKS_PER_SEC) * 1000;
+    }
+
+    return t;
 }
