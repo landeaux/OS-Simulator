@@ -30,6 +30,7 @@ enum State {START, READY, RUNNING, WAIT, EXIT};
 class PCB
 {
 public:
+    PCB();
     PCB(unsigned pid);
     void setState(State state);
     const State getState() const;

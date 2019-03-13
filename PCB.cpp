@@ -18,8 +18,14 @@
 //
 // Class Member Implementation /////////////////////////////////////////////////
 //
+
 /**
- * @brief      Constructs the PCB object.
+ * @brief      Constructs the object (default).
+ */
+PCB::PCB() {}
+
+/**
+ * @brief      Constructs the PCB object (parameterized).
  */
 PCB::PCB(unsigned pid)
 {
