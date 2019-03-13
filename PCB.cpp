@@ -18,7 +18,6 @@
 //
 // Class Member Implementation /////////////////////////////////////////////////
 //
-
 /**
  * @brief      Constructs the PCB object.
  */
