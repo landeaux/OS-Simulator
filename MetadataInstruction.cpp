@@ -101,7 +101,7 @@ const std::string MetadataInstruction::toString() const
     return result;
 }
 
-const std::string MetadataInstruction::genLogString(bool isStart)
+const std::string MetadataInstruction::genLogString(bool isStart, unsigned pid)
 {
     std::string result;
 
@@ -123,7 +123,7 @@ const std::string MetadataInstruction::genLogString(bool isStart)
             result += "removing";
         }
 
-        result += " process";
+        result += " process " + std::to_string(pid);
     }
     else if (this->code == 'M')
     {
@@ -139,6 +139,7 @@ const std::string MetadataInstruction::genLogString(bool isStart)
     }
     else
     {
+        result += "Process " + std::to_string(pid);
         result += isStart ? "start" : "end";
         
         if (this->code == 'P')

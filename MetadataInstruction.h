@@ -33,7 +33,7 @@ public:
     const std::string getDescriptor() const;
     const unsigned long getNumCycles() const;
     const std::string toString() const;
-    const std::string genLogString(bool isStart);
+    const std::string genLogString(bool isStart, unsigned pid);
 private:
     char code;
     std::string descriptor;
