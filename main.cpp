@@ -1,11 +1,17 @@
 // Program Information /////////////////////////////////////////////////////////
+
 /**
  * @file main.cpp
  *
  * @brief Driver program for OS Simulator
  *
  * @details This program is the driver program for OS Simulator classes
- *
+ * 
+ * @version 2.03
+ *          Adam Landis (13 March 2019)
+ *          Add Timer class, pthreads, and threaded wait() function. Change 
+ *          implementation of startSimulation() to test these new additions.
+ * 
  * @version 2.02
  *          Adam Landis (9 March 2019)
  *          Add MetadataInstruction Class and remove metadataInstruction struct.
@@ -44,6 +50,7 @@
  *
  * @note None
  */
+
 // Program Description/Support /////////////////////////////////////////////////
 /*
  * This program runs from the terminal and takes one argument for the filename
@@ -58,18 +65,18 @@
 //
 // Header Files ////////////////////////////////////////////////////////////////
 //
-#include <iostream>
-#include <iomanip>
-#include <fstream>
+#include <iostream>     // cout
+#include <iomanip>      // setprecision, fixed
+#include <fstream>      // ofstream
 #include <string>
-#include <map>
-#include <queue>
-#include <vector>
+#include <map>          // for the configutation settings
+#include <queue>        // for the metadata
 #include <cstdlib>
-#include <ctime>
+#include <pthread.h>    // for threads
 
 #include "PCB.h"
 #include "MetadataInstruction.h"
+#include "Timer.h"
 //
 // Global Constant Definitions /////////////////////////////////////////////////
 //
@@ -154,7 +161,7 @@ void logMetadataFileData(const MetadataInstruction& instr, configMap config);
 std::string generateMetadataLogData(MetadataInstruction instr, const configMap& config);
 
 void startSimulation(configMap config, metadataQueue mdQueue);
-clock_t wait(clock_t &t, double duration);
+void* wait(void* param);
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -996,42 +1003,44 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
  */
 void startSimulation(configMap config, metadataQueue mdQueue)
 {
+    Timer myTimer;
+    float wait_time = 500;
+    float duration;
+
     logData(config, "\n");
-    clock_t t = clock();
 
     std::cout << std::setprecision(6) << std::fixed;
 
     while(!mdQueue.empty())
     {
+        pthread_t tid;
+
         MetadataInstruction instr = mdQueue.front();
         mdQueue.pop();
+        myTimer.startTimer();
+        pthread_create(&tid, NULL, wait, (void*)&wait_time);
+        pthread_join(tid, NULL);
+        duration = myTimer.getDuration();
 
-        t = wait(t, 500);
-        std::string data = std::to_string(((double)t)/CLOCKS_PER_SEC) + " - " + instr.toString() + "\n";
+        std::string data = "Duration: " + std::to_string(duration) + "\n";
         logData(config, data);
     }
 }
 
 /**
- * @brief      Simple timer function that waits a specified duration in msec
- * 
- * @param      t         The clock object  
- * @param[in]  duration  The duration to wait (in msec)
+ * @brief      Thread that waits for a specified amount of time in milliseconds.
  *
- * @return     The updated clock object
- * 
- * @note       Requires ctime
+ * @param      param  The duration parameter
+ *
+ * @return     None
  */
-clock_t wait(clock_t &t, double duration)
+void* wait(void* param)
 {
-    t = clock();
-    double elapsed = 0;
+    float duration = *((float*)param);
+    Timer myTimer;
 
-    while(elapsed < duration)
-    {
-        t = clock() - t;
-        elapsed = (((double)t)/CLOCKS_PER_SEC) * 1000;
-    }
+    myTimer.startTimer();
+    while (myTimer.getDuration() < duration);
 
-    return t;
+    pthread_exit(0);
 }
