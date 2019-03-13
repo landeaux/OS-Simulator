@@ -21,7 +21,11 @@
 /**
  * @brief      Constructs the PCB object.
  */
-PCB::PCB(): state(START) {}
+PCB::PCB(unsigned pid)
+{
+    this->state = START;
+    this->pid = pid;
+}
 
 /**
  * @brief      Sets the process state.
@@ -41,4 +45,14 @@ void PCB::setState(State state)
 const State PCB::getState() const
 {
     return this->state;
+}
+
+/**
+ * @brief      Gets the pid.
+ *
+ * @return     The pid.
+ */
+const unsigned PCB::getPID() const
+{
+    return this->pid;
 }
