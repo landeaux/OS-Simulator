@@ -1,7 +1,8 @@
 /**
  * @file MetadataInstruction.cpp
  * 
- * @brief Implementation file for MetadataInstruction (Process Control Block) class
+ * @brief Implementation file for MetadataInstruction (Process Control Block) 
+ *        class
  * 
  * @details Implements all member methods of MetadataInstruction class
  * 
@@ -96,6 +97,64 @@ const std::string MetadataInstruction::toString() const
     std::string numCycles = std::to_string(this->numCycles);
 
     result = code + "{" + descriptor + "}" + numCycles;
+
+    return result;
+}
+
+const std::string MetadataInstruction::genLogString(bool isStart)
+{
+    std::string result;
+
+    if (this->code == 'S')
+    {
+        result += "Simulator program ";
+        result += (this->descriptor == "begin") ? "starting" : "ending";
+    }
+    else if (this->code == 'A')
+    {
+        result += "OS: ";
+        
+        if (this->descriptor == "begin")
+        {
+            result += isStart ? "preparing" : "starting";
+        }
+        else if (this->descriptor == "finish")
+        {
+            result += "removing";
+        }
+
+        result += " process";
+    }
+    else if (this->code == 'M')
+    {
+        if (this->descriptor == "allocate")
+        {
+            result += isStart ? "allocating memory" : "memory allocated at";
+        }
+        else if (this->descriptor == "block")
+        {
+            result += isStart ? "start" : "end";
+            result += " memory blocking";
+        }
+    }
+    else
+    {
+        result += isStart ? "start" : "end";
+        
+        if (this->code == 'P')
+        {
+            result += " processing action";
+        }
+        else
+        {
+            result += " " + this->descriptor + " ";
+            
+            if (this->code == 'I' || this->code == 'O')
+            {
+                result += (this->code == 'I') ? "input" : "output";
+            }
+        }
+    }
 
     return result;
 }

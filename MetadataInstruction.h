@@ -33,10 +33,12 @@ public:
     const std::string getDescriptor() const;
     const unsigned long getNumCycles() const;
     const std::string toString() const;
+    const std::string genLogString(bool isStart);
 private:
     char code;
     std::string descriptor;
     unsigned long numCycles;
+    std::string logString;
 };
 //
 // Terminating Precompiler Directives
