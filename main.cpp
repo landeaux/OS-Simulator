@@ -1,5 +1,4 @@
 // Program Information /////////////////////////////////////////////////////////
-
 /**
  * @file main.cpp
  *
@@ -50,7 +49,6 @@
  *
  * @note None
  */
-
 // Program Description/Support /////////////////////////////////////////////////
 /*
  * This program runs from the terminal and takes one argument for the filename
@@ -59,10 +57,6 @@
  * operations to perform in the OS simulator.
  *
  */
-// Precompiler Directives //////////////////////////////////////////////////////
-//
-// None
-//
 // Header Files ////////////////////////////////////////////////////////////////
 //
 #include <iostream>     // cout
