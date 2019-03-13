@@ -999,6 +999,8 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 {
     Timer myTimer;
     float duration;
+    PCB* pcb;
+    unsigned pid = 0;
 
     logData(config, "\n");
 
@@ -1013,18 +1015,33 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         configSetting setting = getConfigSetting(instr.getDescriptor(), config);
         unsigned long cycleTime = strToUnsignedLong(setting.value);
         float wait_time = (float)(instr.getNumCycles() * cycleTime);
-        std::string data;        
+        std::string data;
+        
 
         duration = myTimer.getDuration() / 1000.0f;
-        data = std::to_string(duration) + " - " + instr.toString() + " - Before\n";
+        data = std::to_string(duration) + " - " + instr.genLogString(true, pid) + "\n";
         logData(config, data);
-        
+
+        if (instr.getCode() == 'A' && instr.getDescriptor() == "start")
+        {
+            pcb = new PCB(++pid);
+        }
+
         pthread_create(&tid, NULL, wait, (void*)&wait_time);
         pthread_join(tid, NULL);
         
-        duration = myTimer.getDuration() / 1000.0f;
-        data = std::to_string(duration) + " - " + instr.toString() + " - After\n";
-        logData(config, data);
+        if (   instr.getCode() != 'S' && 
+             !(instr.getCode() == 'A' && instr.getDescriptor() == "finish") )
+        {
+            duration = myTimer.getDuration() / 1000.0f;
+            data = std::to_string(duration) + " - " + instr.genLogString(false, pid) + "\n";
+            logData(config, data);
+        }
+
+        if (instr.getCode() == 'A' && instr.getDescriptor() == "finish")
+        {
+            delete pcb;
+        }
 
         mdQueue.pop();
     }
