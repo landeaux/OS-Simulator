@@ -998,26 +998,35 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
 void startSimulation(configMap config, metadataQueue mdQueue)
 {
     Timer myTimer;
-    float wait_time = 500;
     float duration;
 
     logData(config, "\n");
 
     std::cout << std::setprecision(6) << std::fixed;
 
+    myTimer.startTimer();
+
     while(!mdQueue.empty())
     {
         pthread_t tid;
-
         MetadataInstruction instr = mdQueue.front();
-        mdQueue.pop();
-        myTimer.startTimer();
+        configSetting setting = getConfigSetting(instr.getDescriptor(), config);
+        unsigned long cycleTime = strToUnsignedLong(setting.value);
+        float wait_time = (float)(instr.getNumCycles() * cycleTime);
+        std::string data;        
+
+        duration = myTimer.getDuration() / 1000.0f;
+        data = std::to_string(duration) + " - " + instr.toString() + " - Before\n";
+        logData(config, data);
+        
         pthread_create(&tid, NULL, wait, (void*)&wait_time);
         pthread_join(tid, NULL);
-        duration = myTimer.getDuration();
-
-        std::string data = "Duration: " + std::to_string(duration) + "\n";
+        
+        duration = myTimer.getDuration() / 1000.0f;
+        data = std::to_string(duration) + " - " + instr.toString() + " - After\n";
         logData(config, data);
+
+        mdQueue.pop();
     }
 }
 
