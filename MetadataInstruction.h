@@ -5,6 +5,14 @@
  * 
  * @details Specifies all member methods of the MetadataInstruction class
  * 
+ * @version 1.02
+ *          Adam Landis (13 March 2019)
+ *          Add genLogString() method prototype
+ * 
+ * @version 1.01
+ *          Adam Landis (9 March 2019)
+ *          Add toString() method prototype
+ * 
  * @version 1.00
  *          Adam Landis (8 March 2019)
  *          Initial development and testing of MetadataInstruction class

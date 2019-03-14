@@ -1,10 +1,17 @@
 /**
  * @file MetadataInstruction.cpp
  * 
- * @brief Implementation file for MetadataInstruction (Process Control Block) 
- *        class
+ * @brief Implementation file for MetadataInstruction class
  * 
  * @details Implements all member methods of MetadataInstruction class
+ * 
+ * @version 1.02
+ *          Adam Landis
+ *          Add genLogString() method implementation
+ * 
+ * @version 1.01
+ *          Adam Landis
+ *          Add toString() method implementation
  * 
  * @version 1.00
  *          Adam Landis (8 March 2019)
