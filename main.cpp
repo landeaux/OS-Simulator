@@ -1017,15 +1017,15 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         float wait_time = (float)(instr.getNumCycles() * cycleTime);
         std::string data;
         
+        if (instr.getCode() == 'A' && instr.getDescriptor() == "begin")
+        {
+            pid++;
+            pcb = new PCB(pid);
+        }
 
         duration = myTimer.getDuration() / 1000.0f;
         data = std::to_string(duration) + " - " + instr.genLogString(true, pid) + "\n";
         logData(config, data);
-
-        if (instr.getCode() == 'A' && instr.getDescriptor() == "start")
-        {
-            pcb = new PCB(++pid);
-        }
 
         pthread_create(&tid, NULL, wait, (void*)&wait_time);
         pthread_join(tid, NULL);
