@@ -5,6 +5,11 @@
  * 
  * @details Specifies all member methods of the PCB class
  * 
+ * @version 1.01
+ *          Adam Landis (13 March 2019)
+ *          Add data member pid and method prototype getPID().
+ *          Add parameterized constructor to take in pid.
+ * 
  * @version 1.00
  *          Adam Landis (6 March 2019)
  *          Initial development and testing of PCB class

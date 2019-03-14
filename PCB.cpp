@@ -5,6 +5,10 @@
  * 
  * @details Implements all member methods of PCB class
  * 
+ * @version 1.01
+ *          Adam Landis (13 March 2019)
+ *          Add method getPID() implementation
+ * 
  * @version 1.00
  *          Adam Landis (6 March 2019)
  *          Initial development and testing of PCB class
