@@ -36,12 +36,15 @@ class PCB
 {
 public:
     PCB();
-    PCB(unsigned pid);
+    PCB(unsigned int pid);
     void setState(State state);
+    void setProgramCounter(unsigned int pc);
     const State getState() const;
-    const unsigned getPID() const;
+    const unsigned int getPID() const;
+    const unsigned int getProgramCounter() const;
 private:
-    unsigned pid;
+    unsigned int pid;
+    unsigned int pc;
     State state;
 };
 //

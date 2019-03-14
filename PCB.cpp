@@ -31,7 +31,7 @@ PCB::PCB() {}
 /**
  * @brief      Constructs the PCB object (parameterized).
  */
-PCB::PCB(unsigned pid)
+PCB::PCB(unsigned int pid)
 {
     this->state = START;
     this->pid = pid;
@@ -45,6 +45,16 @@ PCB::PCB(unsigned pid)
 void PCB::setState(State state)
 {
     this->state = state;
+}
+
+/**
+ * @brief      Sets the program counter.
+ *
+ * @param[in]  pc    The address to set the program counter to (unsigned int)
+ */
+void PCB::setProgramCounter(unsigned int pc)
+{
+    this->pc = pc;
 }
 
 /**
@@ -62,7 +72,13 @@ const State PCB::getState() const
  *
  * @return     The pid.
  */
-const unsigned PCB::getPID() const
+const unsigned int PCB::getPID() const
 {
     return this->pid;
+}
+
+
+const unsigned int PCB::getProgramCounter() const
+{
+    return this->pc;
 }
