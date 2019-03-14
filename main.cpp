@@ -1020,8 +1020,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         
         if (instr.getCode() == 'A' && instr.getDescriptor() == "begin")
         {
-            pid++;
-            pcb = new PCB(pid);
+            pcb = new PCB(++pid);
         }
 
         duration = myTimer.getDuration() / 1000.0f;
@@ -1053,6 +1052,8 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 
         mdQueue.pop();
     }
+
+    logData(config, "\n");
 }
 
 /**
@@ -1077,7 +1078,7 @@ void* wait(void* param)
  * @brief      Non-threaded version of wait() - waits for a specified amount of
  *             time in milliseconds.
  *
- * @param      param  The duration parameter
+ * @param      duration  The duration to wait for
  *
  * @return     None
  */
