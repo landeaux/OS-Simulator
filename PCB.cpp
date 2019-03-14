@@ -5,6 +5,12 @@
  * 
  * @details Implements all member methods of PCB class
  * 
+ * @version 1.02
+ *          Adam Landis (14 March 2019)
+ *          - Implement setProgramCounter() and getProgramCounter() methods.
+ *          - Change all declarations and parameter types of "unsigned" to 
+ *            "unsigned int".
+ * 
  * @version 1.01
  *          Adam Landis (13 March 2019)
  *          Add method getPID() implementation

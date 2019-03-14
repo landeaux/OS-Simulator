@@ -5,10 +5,17 @@
  * 
  * @details Specifies all member methods of the PCB class
  * 
+ * @version 1.02
+ *          Adam Landis (14 March 2019)
+ *          - Add data member pc.
+ *          - Add setProgramCounter() and getProgramCounter() method prototypes.
+ *          - Change all declarations and parameter types of "unsigned" to 
+ *            "unsigned int".
+ * 
  * @version 1.01
  *          Adam Landis (13 March 2019)
- *          Add data member pid and method prototype getPID().
- *          Add parameterized constructor to take in pid.
+ *          - Add data member pid and method prototype getPID().
+ *          - Add parameterized constructor to take in pid.
  * 
  * @version 1.00
  *          Adam Landis (6 March 2019)
