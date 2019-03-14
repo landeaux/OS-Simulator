@@ -156,6 +156,7 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
 
 void startSimulation(configMap config, metadataQueue mdQueue);
 void* wait(void* param);
+void wait(float duration);
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -1027,9 +1028,16 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         data = std::to_string(duration) + " - " + instr.genLogString(true, pid) + "\n";
         logData(config, data);
 
-        pthread_create(&tid, NULL, wait, (void*)&wait_time);
-        pthread_join(tid, NULL);
-        
+        if (instr.getCode() == 'I' || instr.getCode() == 'O')
+        {
+            pthread_create(&tid, NULL, wait, (void*)&wait_time);
+            pthread_join(tid, NULL);
+        }
+        else
+        {
+            wait(wait_time);
+        }
+
         if (   instr.getCode() != 'S' && 
              !(instr.getCode() == 'A' && instr.getDescriptor() == "finish") )
         {
@@ -1063,4 +1071,20 @@ void* wait(void* param)
     while (myTimer.getDuration() < duration);
 
     pthread_exit(0);
+}
+
+/**
+ * @brief      Non-threaded version of wait() - waits for a specified amount of
+ *             time in milliseconds.
+ *
+ * @param      param  The duration parameter
+ *
+ * @return     None
+ */
+void wait(float duration)
+{
+    Timer myTimer;
+
+    myTimer.startTimer();
+    while (myTimer.getDuration() < duration);
 }
