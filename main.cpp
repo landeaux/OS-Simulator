@@ -1,5 +1,5 @@
 // Program Information /////////////////////////////////////////////////////////
-/**
+ /**
  * @file main.cpp
  *
  * @brief Driver program for OS Simulator
@@ -62,11 +62,13 @@
 #include <iostream>     // cout
 #include <iomanip>      // setprecision, fixed
 #include <fstream>      // ofstream
-#include <string>
+#include <string>       // string, to_string
+#include <sstream>      // stringstream
 #include <map>          // for the configutation settings
 #include <queue>        // for the metadata
-#include <cstdlib>
 #include <pthread.h>    // for threads
+#include <random>       // for generating random numbers
+#include <limits>       // for generating random numbers
 
 #include "PCB.h"
 #include "MetadataInstruction.h"
@@ -157,6 +159,7 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
 void startSimulation(configMap config, metadataQueue mdQueue);
 void* wait(void* param);
 void wait(float duration);
+unsigned int genRandNum();
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -1025,6 +1028,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 
         duration = myTimer.getDuration() / 1000.0f;
         data = std::to_string(duration) + " - " + instr.genLogString(true, pid) + "\n";
+
         logData(config, data);
 
         if (instr.getCode() == 'I' || instr.getCode() == 'O')
@@ -1041,7 +1045,17 @@ void startSimulation(configMap config, metadataQueue mdQueue)
              !(instr.getCode() == 'A' && instr.getDescriptor() == "finish") )
         {
             duration = myTimer.getDuration() / 1000.0f;
-            data = std::to_string(duration) + " - " + instr.genLogString(false, pid) + "\n";
+            data = std::to_string(duration) + " - " + instr.genLogString(false, pid);
+
+            if (instr.getCode() == 'M' && instr.getDescriptor() == "allocate")
+            {
+                unsigned int mem_address = genRandNum();
+                std::stringstream stream;
+                stream << "0x" << std::hex << mem_address;
+                data += " " + std::string(stream.str());
+            }
+
+            data +="\n";
             logData(config, data);
         }
 
@@ -1088,4 +1102,23 @@ void wait(float duration)
 
     myTimer.startTimer();
     while (myTimer.getDuration() < duration);
+}
+
+/**
+ * @brief      Generates a random number between 0 and max value for unsigned
+ *
+ * @return     The generated random number (unsigned int)
+ */
+unsigned int genRandNum()
+{
+    // Get a random seed from the OS entropy device
+    std::random_device rd;
+
+    // Use the 64-bit Mersenne Twister 19937 generator and seed it with entropy
+    std::mt19937_64 eng(rd());  
+                                
+    // Define the distribution
+    std::uniform_int_distribution<unsigned int> distr;
+
+    return distr(eng);
 }
