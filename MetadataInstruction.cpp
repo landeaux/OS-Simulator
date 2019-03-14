@@ -125,37 +125,43 @@ const std::string MetadataInstruction::genLogString(bool isStart, unsigned pid)
 
         result += " process " + std::to_string(pid);
     }
-    else if (this->code == 'M')
-    {
-        if (this->descriptor == "allocate")
-        {
-            result += isStart ? "allocating memory" : "memory allocated at";
-        }
-        else if (this->descriptor == "block")
-        {
-            result += isStart ? "start" : "end";
-            result += " memory blocking";
-        }
-    }
     else
     {
-        result += "Process " + std::to_string(pid);
-        result += isStart ? "start" : "end";
-        
-        if (this->code == 'P')
+        result += "Process " + std::to_string(pid) + ": ";
+
+        if (this->code == 'M')
         {
-            result += " processing action";
+            if (this->descriptor == "allocate")
+            {
+                result += isStart ? "allocating memory" : "memory allocated at";
+            }
+            else if (this->descriptor == "block")
+            {
+                result += isStart ? "start" : "end";
+                result += " memory blocking";
+            }
         }
         else
         {
-            result += " " + this->descriptor + " ";
             
-            if (this->code == 'I' || this->code == 'O')
+            result += isStart ? "start" : "end";
+            
+            if (this->code == 'P')
             {
-                result += (this->code == 'I') ? "input" : "output";
+                result += " processing action";
+            }
+            else
+            {
+                result += " " + this->descriptor + " ";
+                
+                if (this->code == 'I' || this->code == 'O')
+                {
+                    result += (this->code == 'I') ? "input" : "output";
+                }
             }
         }
     }
+        
 
     return result;
 }
