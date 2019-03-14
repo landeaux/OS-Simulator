@@ -1,15 +1,26 @@
 // Program Information /////////////////////////////////////////////////////////
- /**
+/**
  * @file main.cpp
  *
  * @brief Driver program for OS Simulator
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 2.04
+ *          Adam Landis (14 March 2019)
+ *          - Add non-threaded version of wait() function for non I/O operations
+ *          - Add genRandNum() function to generate random numbers for memory 
+ *            allocation purposes
+ *          - Change implementation of startSimulation to properly log all 
+ *            timestamped operations
+ * 
  * @version 2.03
  *          Adam Landis (13 March 2019)
- *          Add Timer class, pthreads, and threaded wait() function. Change 
- *          implementation of startSimulation() to test these new additions.
+ *          - Add Timer class
+ *          - Include pthread.h
+ *          - Add threaded wait() function
+ *          - Change implementation of startSimulation() to test these new 
+ *            additions
  * 
  * @version 2.02
  *          Adam Landis (9 March 2019)
