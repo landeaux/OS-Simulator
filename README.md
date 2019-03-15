@@ -13,5 +13,13 @@ make
 
 To run the program, use the following command from the program directory, and in place of "\<filename>\", provide a configuration file as an argument. (NOTE: the configuration file must have the extension ".conf"):
 ```
-./sim1 <filename>
+./sim2 <filename>
 ```
+
+## Pthreads
+
+This version of the OS-Simulator uses pthreads for a threaded wait() timer function. The location of the created threads is in __main.cpp__ at __line 1052__ (in the startSimulation() function).
+
+## PCB (Process Control Block)
+
+This version of the OS-Simulator also uses a PCB object to simulate a process control block. The class specification and implementation can be found in __PCB.h__ and __PCB.cpp__, respectively. A PCB* object is defined in __main.cpp__ at the beginning of the __startSimulation()__ function (__line 1018__) and allocated a new PCB object when a new process is created (__line 1036__).
