@@ -15,4 +15,4 @@ sim:    MetadataInstruction.o PCB.o Timer.o main.cpp
 	g++ -o sim2 $(CPPFLAGS) MetadataInstruction.o PCB.o Timer.o main.cpp
 
 clean:
-	rm -f sim2
+	rm -f sim2 *.o
