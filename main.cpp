@@ -201,7 +201,6 @@ int main(int argc, char *argv[])
         std::string logFilename;
 
         config = initializeConfig(configFilename);
-        logConfigFileData(config);
 
         metadataFilename = config["File Path"];
         if (metadataFilename.empty())
@@ -803,9 +802,6 @@ metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& co
 
                 MetadataInstruction instr = parseMetadataInstruction(tempInstr);
 
-                // logging happens here
-                logMetadataFileData(instr, config);
-
                 metaQueue.push(instr);
                 start = end + 1;
             } while (end != std::string::npos && start < tempLine.length());
@@ -1021,8 +1017,6 @@ void startSimulation(configMap config, metadataQueue mdQueue)
     float duration;
     PCB* pcb;
     unsigned pid = 0;
-
-    logData(config, "\n");
 
     std::cout << std::setprecision(6) << std::fixed;
 
