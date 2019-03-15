@@ -6,6 +6,11 @@
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 2.05
+ *          Adam Landis (15 March 2019)
+ *          Change implementation of startSimulation() to change PCB state at
+ *          appropriate moments
+ * 
  * @version 2.04
  *          Adam Landis (14 March 2019)
  *          - Add non-threaded version of wait() function for non I/O operations
@@ -1035,6 +1040,11 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         if (instr.getCode() == 'A' && instr.getDescriptor() == "begin")
         {
             pcb = new PCB(++pid);
+            pcb->setState(START);
+        }
+        else if (instr.getCode() == 'P')
+        {
+            pcb->setState(RUNNING);
         }
 
         duration = myTimer.getDuration() / 1000.0f;
@@ -1044,12 +1054,23 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 
         if (instr.getCode() == 'I' || instr.getCode() == 'O')
         {
+            pcb->setState(WAIT);
             pthread_create(&tid, NULL, wait, (void*)&wait_time);
             pthread_join(tid, NULL);
         }
         else
         {
             wait(wait_time);
+        }
+
+        if (instr.getCode() == 'A' && instr.getDescriptor() == "finish")
+        {
+            pcb->setState(EXIT);
+            delete pcb;
+        }
+        else
+        {
+            pcb->setState(READY);
         }
 
         if (   instr.getCode() != 'S' && 
@@ -1066,13 +1087,9 @@ void startSimulation(configMap config, metadataQueue mdQueue)
                 data += " " + std::string(stream.str());
             }
 
-            data +="\n";
+            data += "\n";
+            
             logData(config, data);
-        }
-
-        if (instr.getCode() == 'A' && instr.getDescriptor() == "finish")
-        {
-            delete pcb;
         }
 
         mdQueue.pop();
