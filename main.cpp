@@ -105,6 +105,9 @@ const std::string CONFIG_SETTING_NAMES[] = {
         "Memory cycle time {msec}",
         "Projector cycle time {msec}",
         "System memory {kbytes}",
+        "Memory block size {kbytes}",
+        "Projector quantity",
+        "Hard drive quantity",
         "Log",
         "Log File Path"
 };
@@ -634,18 +637,26 @@ std::string getShortConfigSettingName(const std::string& longStr)
     if (longStr != "Version/Phase" &&
         longStr != "File Path" &&
         longStr != "Log" &&
-        longStr != "Log File Path")
+        longStr != "Log File Path" &&
+        longStr.find("quantity") == std::string::npos)
     {
-        size_t end = longStr.find(' ');
-        result = longStr.substr(0, end);
-        
-        if (result == "Hard")
+        if (longStr.find("Memory block size") != std::string::npos)
         {
-            result += " drive";
+            result = "Memory block size";
         }
-        else if (result == "System")
+        else
         {
-            result += " memory";
+            size_t end = longStr.find(' ');
+            result = longStr.substr(0, end);
+            
+            if (result == "Hard")
+            {
+                result += " drive";
+            }
+            else if (result == "System")
+            {
+                result += " memory";
+            }
         }
     }
     
