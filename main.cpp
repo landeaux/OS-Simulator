@@ -107,6 +107,7 @@
 //
 // Global Constant Definitions /////////////////////////////////////////////////
 //
+const unsigned int UINT_MAX = std::numeric_limits<unsigned int>::max();
 const std::string CONFIG_HEADER = "Start Simulator Configuration File";
 const std::string CONFIG_FOOTER = "End Simulator Configuration File";
 const std::string CONFIG_SETTING_NAMES[] = {
@@ -141,6 +142,10 @@ const std::string METADATA_DESCRIPTORS[] = {
         "projector",
         "block",
 };
+//
+// Global Variable Definitions /////////////////////////////////////////////////
+//
+pthread_mutex_t mutex;
 //
 // Class/Struct Definitions ////////////////////////////////////////////////////
 //
@@ -194,8 +199,8 @@ void startSimulation(configMap config, metadataQueue mdQueue);
 void* wait(void* param);
 void wait(float duration);
 unsigned int genRandNum();
-void* executeInstruction(void* param);
-void executeInstruction();
+void executeMemInstruction(MetadataInstruction instr, unsigned int &nextBlockPtr, unsigned int blockSize, unsigned int &memAddr);
+std::string uintToHexStr(unsigned int num);
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -1047,7 +1052,11 @@ void startSimulation(configMap config, metadataQueue mdQueue)
     Timer myTimer;
     float duration;
     PCB* pcb;
-    unsigned pid = 0;
+    unsigned int memBlockSize, nextBlockPtr = 0, pid = 0;
+
+    memBlockSize = (unsigned int) strToUnsignedLong(config["Memory block size"]);
+
+    pthread_mutex_init(&mutex, NULL);
 
     std::cout << std::setprecision(6) << std::fixed;
 
@@ -1058,6 +1067,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         MetadataInstruction instr = mdQueue.front();
         std::string data;
         float wait_time = instr.getWaitTime();
+        unsigned int memAddr;
         
         if (instr.getCode() == 'A' && instr.getDescriptor() == "begin")
         {
@@ -1082,6 +1092,10 @@ void startSimulation(configMap config, metadataQueue mdQueue)
             pthread_create(&tid, NULL, wait, (void*)&wait_time);
             pthread_join(tid, NULL);
         }
+        else if (instr.getCode() == 'M')
+        {
+            executeMemInstruction(instr, nextBlockPtr, memBlockSize, memAddr);
+        }
         else
         {
             wait(wait_time);
@@ -1105,10 +1119,8 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 
             if (instr.getCode() == 'M' && instr.getDescriptor() == "allocate")
             {
-                unsigned int mem_address = genRandNum();
-                std::stringstream stream;
-                stream << "0x" << std::hex << mem_address;
-                data += " " + std::string(stream.str());
+                data += " ";
+                data += uintToHexStr(memAddr);
             }
 
             data += "\n";
@@ -1169,4 +1181,42 @@ unsigned int genRandNum()
     std::uniform_int_distribution<unsigned int> distr;
 
     return distr(eng);
+}
+
+void executeMemInstruction(MetadataInstruction instr, unsigned int &nextBlockPtr, unsigned int blockSize, unsigned int &memAddr)
+{
+    std::string descriptor = instr.getDescriptor();
+
+    pthread_mutex_lock(&mutex);
+
+    if (descriptor == "allocate")
+    {
+        if (UINT_MAX - nextBlockPtr >= blockSize)
+        {
+            memAddr = nextBlockPtr;
+            nextBlockPtr += blockSize;
+        }
+        else
+        {
+            memAddr = 0;
+            nextBlockPtr = blockSize;
+        }
+    }
+    else if (descriptor == "block")
+    {
+        /* For now, do nothing */
+    }
+
+    pthread_mutex_unlock(&mutex);
+
+    wait(instr.getWaitTime());
+}
+
+std::string uintToHexStr(unsigned int num)
+{
+    std::stringstream stream;
+    stream.width(8);
+    stream.fill('0');
+    stream << std::hex << num;
+    return "0x" + std::string(stream.str());
 }
