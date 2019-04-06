@@ -183,6 +183,8 @@ void startSimulation(configMap config, metadataQueue mdQueue);
 void* wait(void* param);
 void wait(float duration);
 unsigned int genRandNum();
+void* executeInstruction(void* param);
+void executeInstruction();
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -816,6 +818,10 @@ metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& co
 
                 MetadataInstruction instr = parseMetadataInstruction(tempInstr);
 
+                configSetting setting = getConfigSetting(instr.getDescriptor(), config);
+                unsigned long cycleTime = strToUnsignedLong(setting.value);
+                instr.setWaitTime(cycleTime);
+
                 metaQueue.push(instr);
                 start = end + 1;
             } while (end != std::string::npos && start < tempLine.length());
@@ -1036,14 +1042,11 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 
     myTimer.startTimer();
 
-    while(!mdQueue.empty())
+    while (!mdQueue.empty())
     {
-        pthread_t tid;
         MetadataInstruction instr = mdQueue.front();
-        configSetting setting = getConfigSetting(instr.getDescriptor(), config);
-        unsigned long cycleTime = strToUnsignedLong(setting.value);
-        float wait_time = (float)(instr.getNumCycles() * cycleTime);
         std::string data;
+        float wait_time = instr.getWaitTime();
         
         if (instr.getCode() == 'A' && instr.getDescriptor() == "begin")
         {
@@ -1063,6 +1066,8 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         if (instr.getCode() == 'I' || instr.getCode() == 'O')
         {
             pcb->setState(WAIT);
+
+            pthread_t tid;
             pthread_create(&tid, NULL, wait, (void*)&wait_time);
             pthread_join(tid, NULL);
         }
