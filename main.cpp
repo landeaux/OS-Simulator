@@ -1,10 +1,20 @@
 // Program Information /////////////////////////////////////////////////////////
+
 /**
  * @file main.cpp
  *
  * @brief Driver program for OS Simulator
  *
  * @details This program is the driver program for OS Simulator classes
+ * 
+ * @version 3.01
+ *          Adam Landis (6 April 2019)
+ *          - Change implementation of parseMetadataFile() to calc and set 
+ *            waitTime for each metadata instruction before pushing it onto 
+ *            queue.
+ *          - Change implementation of startSimulation() to get wait_time from 
+ *            each metadata instruction instead of calculating it every time in
+ *            the loop.
  * 
  * @version 3.00
  *          Adam Landis (5 April 2019)
@@ -68,7 +78,8 @@
  *          Initial development
  *
  * @note None
- */
+ */ 
+
 // Program Description/Support /////////////////////////////////////////////////
 /*
  * This program runs from the terminal and takes one argument for the filename
