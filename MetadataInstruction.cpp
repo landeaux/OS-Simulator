@@ -5,6 +5,14 @@
  * 
  * @details Implements all member methods of MetadataInstruction class
  * 
+ * @version 1.03
+ *          Adam Landis (6 April 2019)
+ *          - Add overloaded assignment operator implementation
+ *          - Implement setWaitTime() and getWaitTime() methods
+ *          - Change implementation of copy constructor to copy new
+ *            data member waitTime
+ *          - Change implementation of constructor to set default waitTime
+ * 
  * @version 1.02
  *          Adam Landis
  *          Add genLogString() method implementation
@@ -41,6 +49,7 @@ MetadataInstruction::MetadataInstruction(char code,
     this->code = code;
     this->descriptor = descriptor;
     this->numCycles = numCycles;
+    this->waitTime = 0.0;
 }
 
 /**
@@ -53,12 +62,50 @@ MetadataInstruction::MetadataInstruction(const MetadataInstruction &obj)
     this->code = obj.code;
     this->descriptor = obj.descriptor;
     this->numCycles = obj.numCycles;
+    this->waitTime = obj.waitTime;
+}
+
+/**
+ * @brief      Overloaded Assignment Operator
+ *
+ * @param[in]  rhs   The right hand side
+ *
+ * @return     { description_of_the_return_value }
+ */
+MetadataInstruction& MetadataInstruction::operator=(const MetadataInstruction &rhs)
+{
+    this->code = rhs.code;
+    this->descriptor = rhs.descriptor;
+    this->numCycles = rhs.numCycles;
+    this->waitTime = rhs.waitTime;
+
+    return *this;
 }
 
 /**
  * @brief      Destroys the object.
  */
 MetadataInstruction::~MetadataInstruction() {}
+
+/**
+ * @brief      Sets the wait time.
+ *
+ * @param[in]  cycleTime  The cycle time (unsigned long)
+ */
+void MetadataInstruction::setWaitTime(unsigned long cycleTime)
+{
+    this->waitTime = (float)(this->numCycles * cycleTime);
+}
+
+/**
+ * @brief      Gets the wait time.
+ *
+ * @return     The wait time.
+ */
+const float MetadataInstruction::getWaitTime() const
+{
+    return this->waitTime;
+}
 
 /**
  * @brief      Gets the code.

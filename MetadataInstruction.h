@@ -5,6 +5,12 @@
  * 
  * @details Specifies all member methods of the MetadataInstruction class
  * 
+ * @version 1.03
+ *          Adam Landis (6 April 2019)
+ *          - Add overloaded assignment operator prototype
+ *          - Add setWaitTime() and getWaitTime() method prototypes
+ *          - Add data member waitTime
+ * 
  * @version 1.02
  *          Adam Landis (13 March 2019)
  *          Add genLogString() method prototype
@@ -36,7 +42,10 @@ class MetadataInstruction
 public:
     MetadataInstruction(char code, std::string descriptor, unsigned long numCycles);
     MetadataInstruction(const MetadataInstruction &obj);
+    MetadataInstruction& operator=(const MetadataInstruction &rhs);
     ~MetadataInstruction();
+    void setWaitTime(unsigned long cycleTime);
+    const float getWaitTime() const;
     const char getCode() const;
     const std::string getDescriptor() const;
     const unsigned long getNumCycles() const;
@@ -47,6 +56,7 @@ private:
     std::string descriptor;
     unsigned long numCycles;
     std::string logString;
+    float waitTime;
 };
 //
 // Terminating Precompiler Directives
