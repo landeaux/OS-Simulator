@@ -1116,11 +1116,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 void* wait(void* param)
 {
     float duration = *((float*)param);
-    Timer myTimer;
-
-    myTimer.startTimer();
-    while (myTimer.getDuration() < duration);
-
+    wait(duration);
     pthread_exit(0);
 }
 
