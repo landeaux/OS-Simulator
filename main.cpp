@@ -6,6 +6,10 @@
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 3.00
+ *          Adam Landis (5 April 2019)
+ *          Add support for configuration settings.
+ * 
  * @version 2.05
  *          Adam Landis (15 March 2019)
  *          Change implementation of startSimulation() to change PCB state at
