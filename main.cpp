@@ -189,7 +189,6 @@ unsigned int genRandNum();
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    PCB pcb;
 
     try
     {
