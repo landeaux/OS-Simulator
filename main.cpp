@@ -1265,9 +1265,9 @@ void* executeIOInstruction(void* param)
 
     sem_wait(sem);
 
-    sem_post(sem);
-
     wait(instr.getWaitTime());
+
+    sem_post(sem);
 
     return 0;
 }
