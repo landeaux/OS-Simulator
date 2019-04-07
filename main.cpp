@@ -1238,9 +1238,9 @@ void executeMemInstruction(MetadataInstruction instr, unsigned &nextBlockPtr, un
         /* For now, do nothing */
     }
 
-    pthread_mutex_unlock(&mutex);
-
     wait(instr.getWaitTime());
+    
+    pthread_mutex_unlock(&mutex);
 }
 
 std::string uintToHexStr(unsigned num)
