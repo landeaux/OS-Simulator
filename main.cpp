@@ -7,6 +7,14 @@
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 3.02
+ *          Adam Landis (6 April 2019)
+ *          - Add executeMemInstruction() for memory allocation (and soon,  
+ *            blocking) functionality
+ *          - Add uintToHex() function to convert an unsigned to a 
+ *            hexidecimal string
+ *          - Add mutex locks for memory instructions
+ * 
  * @version 3.01
  *          Adam Landis (6 April 2019)
  *          - Change implementation of parseMetadataFile() to calc and set 
@@ -107,7 +115,7 @@
 //
 // Global Constant Definitions /////////////////////////////////////////////////
 //
-const unsigned int UINT_MAX = std::numeric_limits<unsigned int>::max();
+const unsigned UINT_MAX = std::numeric_limits<unsigned>::max();
 const std::string CONFIG_HEADER = "Start Simulator Configuration File";
 const std::string CONFIG_FOOTER = "End Simulator Configuration File";
 const std::string CONFIG_SETTING_NAMES[] = {
@@ -198,9 +206,9 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
 void startSimulation(configMap config, metadataQueue mdQueue);
 void* wait(void* param);
 void wait(float duration);
-unsigned int genRandNum();
-void executeMemInstruction(MetadataInstruction instr, unsigned int &nextBlockPtr, unsigned int blockSize, unsigned int &memAddr);
-std::string uintToHexStr(unsigned int num);
+unsigned genRandNum();
+void executeMemInstruction(MetadataInstruction instr, unsigned &nextBlockPtr, unsigned blockSize, unsigned &memAddr);
+std::string uintToHexStr(unsigned num);
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
@@ -1052,9 +1060,9 @@ void startSimulation(configMap config, metadataQueue mdQueue)
     Timer myTimer;
     float duration;
     PCB* pcb;
-    unsigned int memBlockSize, nextBlockPtr = 0, pid = 0;
+    unsigned memBlockSize, nextBlockPtr = 0, pid = 0;
 
-    memBlockSize = (unsigned int) strToUnsignedLong(config["Memory block size"]);
+    memBlockSize = (unsigned) strToUnsignedLong(config["Memory block size"]);
 
     pthread_mutex_init(&mutex, NULL);
 
@@ -1067,7 +1075,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         MetadataInstruction instr = mdQueue.front();
         std::string data;
         float wait_time = instr.getWaitTime();
-        unsigned int memAddr;
+        unsigned memAddr;
         
         if (instr.getCode() == 'A' && instr.getDescriptor() == "begin")
         {
@@ -1167,9 +1175,9 @@ void wait(float duration)
 /**
  * @brief      Generates a random number between 0 and max value for unsigned
  *
- * @return     The generated random number (unsigned int)
+ * @return     The generated random number (unsigned)
  */
-unsigned int genRandNum()
+unsigned genRandNum()
 {
     // Get a random seed from the OS entropy device
     std::random_device rd;
@@ -1178,12 +1186,12 @@ unsigned int genRandNum()
     std::mt19937_64 eng(rd());  
                                 
     // Define the distribution
-    std::uniform_int_distribution<unsigned int> distr;
+    std::uniform_int_distribution<unsigned> distr;
 
     return distr(eng);
 }
 
-void executeMemInstruction(MetadataInstruction instr, unsigned int &nextBlockPtr, unsigned int blockSize, unsigned int &memAddr)
+void executeMemInstruction(MetadataInstruction instr, unsigned &nextBlockPtr, unsigned blockSize, unsigned &memAddr)
 {
     std::string descriptor = instr.getDescriptor();
 
@@ -1212,7 +1220,7 @@ void executeMemInstruction(MetadataInstruction instr, unsigned int &nextBlockPtr
     wait(instr.getWaitTime());
 }
 
-std::string uintToHexStr(unsigned int num)
+std::string uintToHexStr(unsigned num)
 {
     std::stringstream stream;
     stream.width(8);
