@@ -12,7 +12,7 @@ Timer.o:  Timer.h Timer.cpp
 	g++ -c $(CPPFLAGS) Timer.cpp
 
 sim:    MetadataInstruction.o PCB.o Timer.o main.cpp
-	g++ -o sim2 $(CPPFLAGS) MetadataInstruction.o PCB.o Timer.o main.cpp
+	g++ -o sim3 $(CPPFLAGS) MetadataInstruction.o PCB.o Timer.o main.cpp
 
 clean:
-	rm -f sim2 *.o
+	rm -f sim3 *.o
