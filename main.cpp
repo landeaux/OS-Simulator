@@ -7,6 +7,15 @@
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 3.03
+ *          Adam Landis (7 April 2019)
+ *          - Add support for semaphores
+ *          - Change implementation of startSimulation() to initialize 
+ *            semaphores for resource management
+ *          - Add threaded function executeIOInstruction() to execute IO 
+ *            instructions and utilize semaphores for resource managemnent and 
+ *            mutual exclusion
+ * 
  * @version 3.02
  *          Adam Landis (6 April 2019)
  *          - Add executeMemInstruction() for memory allocation (and soon,  
@@ -106,6 +115,7 @@
 #include <map>          // for the configutation settings
 #include <queue>        // for the metadata
 #include <pthread.h>    // for threads
+#include <semaphore.h>  // for semaphores
 #include <random>       // for generating random numbers
 #include <limits>       // for generating random numbers
 
@@ -153,7 +163,8 @@ const std::string METADATA_DESCRIPTORS[] = {
 //
 // Global Variable Definitions /////////////////////////////////////////////////
 //
-pthread_mutex_t mutex;
+pthread_mutex_t mutex;      // mutex for memory management
+sem_t semHD, semProj;     // semaphores for resource management
 //
 // Class/Struct Definitions ////////////////////////////////////////////////////
 //
@@ -208,6 +219,7 @@ void* wait(void* param);
 void wait(float duration);
 unsigned genRandNum();
 void executeMemInstruction(MetadataInstruction instr, unsigned &nextBlockPtr, unsigned blockSize, unsigned &memAddr);
+void* executeIOInstruction(void* param);
 std::string uintToHexStr(unsigned num);
 //
 // Main Function Implementation ////////////////////////////////////////////////
@@ -1060,11 +1072,17 @@ void startSimulation(configMap config, metadataQueue mdQueue)
     Timer myTimer;
     float duration;
     PCB* pcb;
-    unsigned memBlockSize, nextBlockPtr = 0, pid = 0;
+    unsigned numHD, numProj, memBlockSize, nextBlockPtr = 0, pid = 0;
 
-    memBlockSize = (unsigned) strToUnsignedLong(config["Memory block size"]);
+    numHD   = (unsigned) strToUnsignedLong(config["Hard drive quantity"]);
+    numProj = (unsigned) strToUnsignedLong(config["Projector quantity"]);
+
+    memBlockSize = (unsigned) strToUnsignedLong(config["Memory block size"]);    
 
     pthread_mutex_init(&mutex, NULL);
+
+    sem_init(&semHD,   0, numHD);
+    sem_init(&semProj, 0, numProj);
 
     std::cout << std::setprecision(6) << std::fixed;
 
@@ -1073,6 +1091,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
     while (!mdQueue.empty())
     {
         MetadataInstruction instr = mdQueue.front();
+
         std::string data;
         float wait_time = instr.getWaitTime();
         unsigned memAddr;
@@ -1097,6 +1116,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
             pcb->setState(WAIT);
 
             pthread_t tid;
+            // pthread_create(&tid, NULL, executeIOInstruction, (void*)&instr);
             pthread_create(&tid, NULL, wait, (void*)&wait_time);
             pthread_join(tid, NULL);
         }
@@ -1114,7 +1134,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
             pcb->setState(EXIT);
             delete pcb;
         }
-        else
+        else if (instr.getCode() != 'S')
         {
             pcb->setState(READY);
         }
@@ -1227,4 +1247,27 @@ std::string uintToHexStr(unsigned num)
     stream.fill('0');
     stream << std::hex << num;
     return "0x" + std::string(stream.str());
+}
+
+void* executeIOInstruction(void* param)
+{
+    MetadataInstruction instr = *((MetadataInstruction*)param);
+    sem_t *sem;
+
+    if (instr.getDescriptor() == "projector")
+    {
+        sem = &semHD;
+    }
+    else if (instr.getDescriptor() == "hard drive")
+    {
+        sem = &semProj;
+    }
+
+    sem_wait(sem);
+
+    sem_post(sem);
+
+    wait(instr.getWaitTime());
+
+    return 0;
 }
