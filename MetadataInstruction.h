@@ -34,6 +34,7 @@
 // Header Files ////////////////////////////////////////////////////////////////
 // 
 #include <string>
+#include <semaphore.h>
 //
 // Class Definition ////////////////////////////////////////////////////////////
 // 
@@ -45,7 +46,9 @@ public:
     MetadataInstruction& operator=(const MetadataInstruction &rhs);
     ~MetadataInstruction();
     void setWaitTime(unsigned long cycleTime);
+    void setSemPtr(sem_t *semPtr);
     const float getWaitTime() const;
+    sem_t *getSemPtr();
     const char getCode() const;
     const std::string getDescriptor() const;
     const unsigned long getNumCycles() const;
@@ -57,6 +60,7 @@ private:
     unsigned long numCycles;
     std::string logString;
     float waitTime;
+    sem_t *semPtr;
 };
 //
 // Terminating Precompiler Directives

@@ -98,6 +98,16 @@ void MetadataInstruction::setWaitTime(unsigned long cycleTime)
 }
 
 /**
+ * @brief      Sets the semaphore pointer.
+ *
+ * @param      sem   The semaphore pointer
+ */
+void MetadataInstruction::setSemPtr(sem_t *semPtr)
+{
+    this->semPtr = semPtr;
+}
+
+/**
  * @brief      Gets the wait time.
  *
  * @return     The wait time.
@@ -105,6 +115,16 @@ void MetadataInstruction::setWaitTime(unsigned long cycleTime)
 const float MetadataInstruction::getWaitTime() const
 {
     return this->waitTime;
+}
+
+/**
+ * @brief      Gets the semaphore pointer.
+ *
+ * @return     The semaphore pointer.
+ */
+sem_t *MetadataInstruction::getSemPtr()
+{
+    return this->semPtr;
 }
 
 /**
