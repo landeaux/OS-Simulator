@@ -1,4 +1,4 @@
-CPPFLAGS=-std=c++11 -Wall -pthread
+CPPFLAGS=-std=c++11 -Wall -pthread -lpthread
 
 all: clean sim
 
