@@ -858,6 +858,29 @@ metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& co
                 unsigned long cycleTime = strToUnsignedLong(setting.value);
                 instr.setWaitTime(cycleTime);
 
+                std::string descriptor = instr.getDescriptor();
+                
+                if (descriptor == "projector")
+                {
+                    instr.setSemPtr(&semHD);
+                }
+                else if (descriptor == "hard drive")
+                {
+                    instr.setSemPtr(&semProj);
+                }
+                else if (descriptor == "keyboard")
+                {
+                    instr.setSemPtr(&semKB);
+                }
+                else if (descriptor == "monitor")
+                {
+                    instr.setSemPtr(&semMon);
+                }
+                else if (descriptor == "scanner")
+                {
+                    instr.setSemPtr(&semScan);
+                }
+
                 metaQueue.push(instr);
                 start = end + 1;
             } while (end != std::string::npos && start < tempLine.length());
@@ -1256,35 +1279,16 @@ std::string uintToHexStr(unsigned num)
 void* executeIOInstruction(void* param)
 {
     MetadataInstruction instr = *((MetadataInstruction*)param);
-    sem_t *sem;
+    sem_t *semPtr;
     std::string descriptor = instr.getDescriptor();
 
-    if (descriptor == "projector")
-    {
-        sem = &semHD;
-    }
-    else if (descriptor == "hard drive")
-    {
-        sem = &semProj;
-    }
-    else if (descriptor == "keyboard")
-    {
-        sem = &semKB;
-    }
-    else if (descriptor == "monitor")
-    {
-        sem = &semMon;
-    }
-    else if (descriptor == "scanner")
-    {
-        sem = &semScan;
-    }
+    semPtr = instr.getSemPtr();
 
-    sem_wait(sem);
+    sem_wait(semPtr);
 
     wait(instr.getWaitTime());
 
-    sem_post(sem);
+    sem_post(semPtr);
 
     return 0;
 }
