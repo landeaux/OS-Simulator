@@ -163,8 +163,8 @@ const std::string METADATA_DESCRIPTORS[] = {
 //
 // Global Variable Definitions /////////////////////////////////////////////////
 //
-pthread_mutex_t mutex;      // mutex for memory management
-sem_t semHD, semProj;     // semaphores for resource management
+pthread_mutex_t mutex;                          // mutex for memory mgmt
+sem_t semHD, semProj, semKB, semMon, semScan;   // semaphores for resource mgmt
 //
 // Class/Struct Definitions ////////////////////////////////////////////////////
 //
@@ -1083,6 +1083,9 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 
     sem_init(&semHD,   0, numHD);
     sem_init(&semProj, 0, numProj);
+    sem_init(&semKB,   0, 1);
+    sem_init(&semMon,  0, 1);
+    sem_init(&semScan, 0, 1);
 
     std::cout << std::setprecision(6) << std::fixed;
 
@@ -1253,14 +1256,27 @@ void* executeIOInstruction(void* param)
 {
     MetadataInstruction instr = *((MetadataInstruction*)param);
     sem_t *sem;
+    std::string descriptor = instr.getDescriptor();
 
-    if (instr.getDescriptor() == "projector")
+    if (descriptor == "projector")
     {
         sem = &semHD;
     }
-    else if (instr.getDescriptor() == "hard drive")
+    else if (descriptor == "hard drive")
     {
         sem = &semProj;
+    }
+    else if (descriptor == "keyboard")
+    {
+        sem = &semKB;
+    }
+    else if (descriptor == "monitor")
+    {
+        sem = &semMon;
+    }
+    else if (descriptor == "scanner")
+    {
+        sem = &semScan;
     }
 
     sem_wait(sem);
