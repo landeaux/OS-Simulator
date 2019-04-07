@@ -50,6 +50,7 @@ MetadataInstruction::MetadataInstruction(char code,
     this->descriptor = descriptor;
     this->numCycles = numCycles;
     this->waitTime = 0.0;
+    this->semPtr = NULL;
 }
 
 /**
@@ -63,6 +64,7 @@ MetadataInstruction::MetadataInstruction(const MetadataInstruction &obj)
     this->descriptor = obj.descriptor;
     this->numCycles = obj.numCycles;
     this->waitTime = obj.waitTime;
+    this->semPtr = obj.semPtr;
 }
 
 /**
@@ -78,6 +80,7 @@ MetadataInstruction& MetadataInstruction::operator=(const MetadataInstruction &r
     this->descriptor = rhs.descriptor;
     this->numCycles = rhs.numCycles;
     this->waitTime = rhs.waitTime;
+    this->semPtr = rhs.semPtr;
 
     return *this;
 }
