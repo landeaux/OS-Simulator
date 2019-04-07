@@ -5,6 +5,12 @@
  * 
  * @details Implements all member methods of MetadataInstruction class
  * 
+ * @version 1.04
+ *          Adam Landis (7 April 2019)
+ *          - Implement setter/getter funcs for new data member semPtr
+ *          - Change constructors and overloaded assignment operator to 
+ *            instantiate/copy semPtr
+ * 
  * @version 1.03
  *          Adam Landis (6 April 2019)
  *          - Add overloaded assignment operator implementation

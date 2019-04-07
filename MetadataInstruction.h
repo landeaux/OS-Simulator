@@ -5,6 +5,11 @@
  * 
  * @details Specifies all member methods of the MetadataInstruction class
  * 
+ * @version 1.04
+ *          Adam Landis (7 April 2019)
+ *          - Add inclusion of semaphore.h header
+ *          - Add setter/getter func prototypes for new data member semPtr
+ * 
  * @version 1.03
  *          Adam Landis (6 April 2019)
  *          - Add overloaded assignment operator prototype
