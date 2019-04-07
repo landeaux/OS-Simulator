@@ -1094,17 +1094,18 @@ void startSimulation(configMap config, metadataQueue mdQueue)
     while (!mdQueue.empty())
     {
         MetadataInstruction instr = mdQueue.front();
-
-        std::string data;
+        char code = instr.getCode();
+        std::string descriptor = instr.getDescriptor();
         float wait_time = instr.getWaitTime();
         unsigned memAddr;
+        std::string data;
         
-        if (instr.getCode() == 'A' && instr.getDescriptor() == "begin")
+        if (code == 'A' && descriptor == "begin")
         {
             pcb = new PCB(++pid);
             pcb->setState(START);
         }
-        else if (instr.getCode() == 'P')
+        else if (code == 'P')
         {
             pcb->setState(RUNNING);
         }
@@ -1114,7 +1115,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 
         logData(config, data);
 
-        if (instr.getCode() == 'I' || instr.getCode() == 'O')
+        if (code == 'I' || code == 'O')
         {
             pcb->setState(WAIT);
 
@@ -1123,7 +1124,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
             pthread_create(&tid, NULL, wait, (void*)&wait_time);
             pthread_join(tid, NULL);
         }
-        else if (instr.getCode() == 'M')
+        else if (code == 'M')
         {
             executeMemInstruction(instr, nextBlockPtr, memBlockSize, memAddr);
         }
@@ -1132,23 +1133,23 @@ void startSimulation(configMap config, metadataQueue mdQueue)
             wait(wait_time);
         }
 
-        if (instr.getCode() == 'A' && instr.getDescriptor() == "finish")
+        if (code == 'A' && descriptor == "finish")
         {
             pcb->setState(EXIT);
             delete pcb;
         }
-        else if (instr.getCode() != 'S')
+        else if (code != 'S')
         {
             pcb->setState(READY);
         }
 
-        if (   instr.getCode() != 'S' && 
-             !(instr.getCode() == 'A' && instr.getDescriptor() == "finish") )
+        if (   code != 'S' && 
+             !(code == 'A' && descriptor == "finish") )
         {
             duration = myTimer.getDuration() / 1000.0f;
             data = std::to_string(duration) + " - " + instr.genLogString(false, pid);
 
-            if (instr.getCode() == 'M' && instr.getDescriptor() == "allocate")
+            if (code == 'M' && descriptor == "allocate")
             {
                 data += " ";
                 data += uintToHexStr(memAddr);
