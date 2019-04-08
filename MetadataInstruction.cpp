@@ -5,6 +5,10 @@
  * 
  * @details Implements all member methods of MetadataInstruction class
  * 
+ * @version 1.05
+ *          Adam Landis (7 April 2019)
+ *          Update genLogString() for hard drive and projector output
+ * 
  * @version 1.04
  *          Adam Landis (7 April 2019)
  *          - Implement setter/getter funcs for new data member semPtr
@@ -226,7 +230,6 @@ const std::string MetadataInstruction::genLogString(bool isStart, unsigned pid)
         }
         else
         {
-            
             result += isStart ? "start" : "end";
             
             if (this->code == 'P')
@@ -240,11 +243,22 @@ const std::string MetadataInstruction::genLogString(bool isStart, unsigned pid)
                 if (this->code == 'I' || this->code == 'O')
                 {
                     result += (this->code == 'I') ? "input" : "output";
+
+                    if (isStart)
+                    {
+                        if (this->descriptor == "hard drive")
+                        {
+                            result += " on HDD ";
+                        }
+                        else if (this->descriptor == "projector")
+                        {
+                            result += " on PROJ ";
+                        }
+                    }
                 }
             }
         }
     }
-        
 
     return result;
 }
