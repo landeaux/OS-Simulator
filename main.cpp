@@ -137,25 +137,6 @@
 //
 // Global Constant Definitions /////////////////////////////////////////////////
 //
-const std::string CONFIG_HEADER = "Start Simulator Configuration File";
-const std::string CONFIG_FOOTER = "End Simulator Configuration File";
-const std::string CONFIG_SETTING_NAMES[] = {
-        "Version/Phase",
-        "File Path",
-        "Monitor display time {msec}",
-        "Processor cycle time {msec}",
-        "Scanner cycle time {msec}",
-        "Hard drive cycle time {msec}",
-        "Keyboard cycle time {msec}",
-        "Memory cycle time {msec}",
-        "Projector cycle time {msec}",
-        "System memory {kbytes}",
-        "Memory block size {kbytes}",
-        "Projector quantity",
-        "Hard drive quantity",
-        "Log",
-        "Log File Path"
-};
 const std::string METADATA_HEADER = "Start Program Meta-Data Code:";
 const std::string METADATA_FOOTER = "End Program Meta-Data Code.";
 const std::string METADATA_CODES = "SAPIOM";
