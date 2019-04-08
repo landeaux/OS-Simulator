@@ -129,6 +129,7 @@
 #include "MetadataInstruction.h"
 #include "Metadata.h"
 #include "Timer.h"
+#include "Simulation.h"
 //
 // Global Constant Definitions /////////////////////////////////////////////////
 //
@@ -179,8 +180,9 @@ int main(int argc, char *argv[])
             throw std::string("Error: missing argument for configuration file");
         }
 
-        std::string configFilename = argv[1], metadataFilename, logFilename;
-        std::ofstream logFile;
+        std::string configFilename = argv[1], metadataFilename;
+
+        Simulation mySim(configFilename);
 
         config = new Config(configFilename);
 
