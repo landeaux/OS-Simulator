@@ -112,16 +112,13 @@
  * of the configuration file to be used to initialize the OS simulator. This
  * config file contains the filename of a meta data file for use in loading the
  * operations to perform in the OS simulator.
- *
  */
-
 // Header Files ////////////////////////////////////////////////////////////////
 //
 #include <iostream>     // cout
 #include <iomanip>      // setprecision, fixed
 #include <fstream>      // ifstream, ofstream
 #include <string>       // string, to_string
-#include <map>          // for the configutation settings
 #include <queue>        // for the metadata
 #include <pthread.h>    // for threads
 #include <semaphore.h>  // for semaphores
@@ -152,7 +149,7 @@ const std::string METADATA_DESCRIPTORS[] = {
 //
 // Global Variable Definitions /////////////////////////////////////////////////
 //
-Config *myConfig;
+Config *config;
 pthread_mutex_t mutex;                          // mutex for memory mgmt
 sem_t semHD, semProj, semKB, semMon, semScan;   // semaphores for resource mgmt
 //
@@ -195,7 +192,7 @@ int main(int argc, char *argv[])
         {
             throw std::string("Error: missing argument for configuration file");
         }
-        
+
         std::string configFilename = argv[1];
 
         metadataQueue metaQueue;
@@ -204,9 +201,9 @@ int main(int argc, char *argv[])
         std::ofstream logFile;
         std::string logFilename;
 
-        myConfig = new Config(configFilename);
+        config = new Config(configFilename);
 
-        metadataFilename = myConfig->getSettingVal("File Path");
+        metadataFilename = config->getSettingVal("File Path");
 
         if (metadataFilename.empty())
         {
@@ -293,9 +290,6 @@ void validateMetadataFile(std::ifstream& metadataFile, const std::string& filena
  * @param   metadataFile
  *          The metadata file to parse
  *
- * @param   config
- *          The config map object containing all configuration settings
- *
  * @return  a queue containing metadata instructions
  */
 metadataQueue parseMetadataFile(std::ifstream& metadataFile)
@@ -338,7 +332,7 @@ metadataQueue parseMetadataFile(std::ifstream& metadataFile)
 
                 MetadataInstruction instr = parseMetadataInstruction(tempInstr);
 
-                configSetting setting = myConfig->getConfigSetting(instr.getDescriptor());
+                configSetting setting = config->getConfigSetting(instr.getDescriptor());
                 unsigned long cycleTime = strToUnsignedLong(setting.value);
                 instr.setWaitTime(cycleTime);
 
@@ -506,8 +500,8 @@ void logMetadataFileData(const MetadataInstruction& instr)
 {
     static bool beginLog = false;
     std::string logData;
-    std::string logType = myConfig->getSettingVal("Log");
-    std::string logFilePath = myConfig->getSettingVal("Log File Path");
+    std::string logType = config->getSettingVal("Log");
+    std::string logFilePath = config->getSettingVal("Log File Path");
 
     if (!beginLog)
     {
@@ -551,7 +545,7 @@ std::string generateMetadataLogData(MetadataInstruction instr)
 
     if (instr.getNumCycles() > 0)
     {
-        configSetting setting = myConfig->getConfigSetting(instr.getDescriptor());
+        configSetting setting = config->getConfigSetting(instr.getDescriptor());
 
         unsigned long cycleTime = strToUnsignedLong(setting.value);
         std::string totalTime = std::to_string(instr.getNumCycles() * cycleTime);
@@ -565,7 +559,6 @@ std::string generateMetadataLogData(MetadataInstruction instr)
 /**
  * @brief      Starts the OS simulation.
  *
- * @param[in]  config   The configuration map
  * @param[in]  mdQueue  The queue of metadata instructions
  */
 void startSimulation(metadataQueue mdQueue)
@@ -578,11 +571,11 @@ void startSimulation(metadataQueue mdQueue)
              sysMem, memBlockSize, nextBlockPtr = 0,
              pid = 0;
 
-    numHD   = (unsigned) strToUnsignedLong(myConfig->getSettingVal("Hard drive quantity"));
-    numProj = (unsigned) strToUnsignedLong(myConfig->getSettingVal("Projector quantity"));
+    numHD   = (unsigned) strToUnsignedLong(config->getSettingVal("Hard drive quantity"));
+    numProj = (unsigned) strToUnsignedLong(config->getSettingVal("Projector quantity"));
 
-    sysMem       = (unsigned) strToUnsignedLong(myConfig->getSettingVal("System memory"));
-    memBlockSize = (unsigned) strToUnsignedLong(myConfig->getSettingVal("Memory block size"));
+    sysMem       = (unsigned) strToUnsignedLong(config->getSettingVal("System memory"));
+    memBlockSize = (unsigned) strToUnsignedLong(config->getSettingVal("Memory block size"));
 
     pthread_mutex_init(&mutex, NULL);
 
@@ -629,7 +622,7 @@ void startSimulation(metadataQueue mdQueue)
 
         data += "\n";
 
-        myConfig->logData(data);
+        config->logData(data);
 
         if (code == 'I' || code == 'O')
         {
@@ -673,13 +666,13 @@ void startSimulation(metadataQueue mdQueue)
 
             data += "\n";
             
-            myConfig->logData(data);
+            config->logData(data);
         }
 
         mdQueue.pop();
     }
 
-    myConfig->logData("\n");
+    config->logData("\n");
 }
 
 /**
