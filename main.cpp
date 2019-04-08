@@ -859,12 +859,12 @@ metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& co
                 instr.setWaitTime(cycleTime);
 
                 std::string descriptor = instr.getDescriptor();
-                
-                if (descriptor == "projector")
+
+                if (descriptor == "hard drive")
                 {
                     instr.setSemPtr(&semHD);
                 }
-                else if (descriptor == "hard drive")
+                else if (descriptor == "projector")
                 {
                     instr.setSemPtr(&semProj);
                 }
@@ -1095,7 +1095,10 @@ void startSimulation(configMap config, metadataQueue mdQueue)
     Timer myTimer;
     float duration;
     PCB* pcb;
-    unsigned numHD, numProj, memBlockSize, nextBlockPtr = 0, pid = 0;
+    unsigned numHD, countHD = 0,
+             numProj, countProj = 0,
+             memBlockSize, nextBlockPtr = 0,
+             pid = 0;
 
     numHD   = (unsigned) strToUnsignedLong(config["Hard drive quantity"]);
     numProj = (unsigned) strToUnsignedLong(config["Projector quantity"]);
@@ -1134,7 +1137,18 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         }
 
         duration = myTimer.getDuration() / 1000.0f;
-        data = std::to_string(duration) + " - " + instr.genLogString(true, pid) + "\n";
+        data = std::to_string(duration) + " - " + instr.genLogString(true, pid);
+
+        if (descriptor == "hard drive")
+        {
+            data += std::to_string(countHD++ % numHD);
+        }
+        else if (descriptor == "projector")
+        {
+            data += std::to_string(countProj++ % numProj);
+        }
+
+        data += "\n";
 
         logData(config, data);
 
