@@ -7,6 +7,11 @@
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 3.05
+ *          Adam Landis (8 April 2019)
+ *          Update to utilize new Config class and moved all helper functions to
+ *          their own helpers.cpp file.
+ * 
  * @version 3.04
  *          Adam Landis (7 April 2019)
  *          - Add semaphores for all I/O resources
