@@ -22,6 +22,7 @@
 //
 // Header Files ////////////////////////////////////////////////////////////////
 //
+#include <iostream>
 #include <string>
 #include <fstream>
 //
@@ -30,6 +31,12 @@
 bool isValidFileExtension(const std::string& filename, const std::string& ext);
 bool isEmptyFile(std::ifstream& file);
 bool isPositiveInteger(const std::string& str);
+bool isNonNegativeInteger(const std::string& str);
+std::string stripSpaces(const std::string& s);
+unsigned long strToUnsignedLong(const std::string& str);
+void logToMonitor(std::string& logData);
+void logToFile(std::string& logData, std::string& logFilename,
+               std::ios_base::openmode mode = std::ios_base::app);
 //
 // Terminating Precompiler Directives
 // 
