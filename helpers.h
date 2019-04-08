@@ -25,6 +25,9 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <random>       // for generating random numbers
+#include <limits>       // for generating random numbers
+#include <sstream>      // stringstream
 //
 // Function Prototypes
 // 
@@ -37,6 +40,8 @@ unsigned long strToUnsignedLong(const std::string& str);
 void logToMonitor(std::string& logData);
 void logToFile(std::string& logData, std::string& logFilename,
                std::ios_base::openmode mode = std::ios_base::app);
+unsigned genRandNum();
+std::string uintToHexStr(unsigned num);
 //
 // Terminating Precompiler Directives
 // 

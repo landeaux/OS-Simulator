@@ -121,13 +121,10 @@
 #include <iomanip>      // setprecision, fixed
 #include <fstream>      // ifstream, ofstream
 #include <string>       // string, to_string
-#include <sstream>      // stringstream
 #include <map>          // for the configutation settings
 #include <queue>        // for the metadata
 #include <pthread.h>    // for threads
 #include <semaphore.h>  // for semaphores
-#include <random>       // for generating random numbers
-#include <limits>       // for generating random numbers
 
 #include "helpers.h"
 #include "Config.h"
@@ -160,7 +157,6 @@ sem_t semHD, semProj, semKB, semMon, semScan;   // semaphores for resource mgmt
 //
 // Typedefs ////////////////////////////////////////////////////////////////////
 //
-typedef std::map<std::string, std::string> configMap;
 typedef std::queue<MetadataInstruction> metadataQueue;
 //
 // Free Function Prototypes ////////////////////////////////////////////////////
@@ -886,25 +882,6 @@ void wait(float duration)
 }
 
 /**
- * @brief      Generates a random number between 0 and max value for unsigned
- *
- * @return     The generated random number (unsigned)
- */
-unsigned genRandNum()
-{
-    // Get a random seed from the OS entropy device
-    std::random_device rd;
-
-    // Use the 64-bit Mersenne Twister 19937 generator and seed it with entropy
-    std::mt19937_64 eng(rd());  
-                                
-    // Define the distribution
-    std::uniform_int_distribution<unsigned> distr;
-
-    return distr(eng);
-}
-
-/**
  * @brief      Executes a memory instruction
  *
  * @param[in]  instr         The instruction
@@ -945,22 +922,6 @@ void executeMemInstruction(
     wait(instr.getWaitTime());
     
     pthread_mutex_unlock(&mutex);
-}
-
-/**
- * @brief      Converts an unsigned integer to a string in hexidecimal format
- *
- * @param[in]  num   The unsigned integer to convert
- *
- * @return     The resultant hex string after conversion
- */
-std::string uintToHexStr(unsigned num)
-{
-    std::stringstream stream;
-    stream.width(8);
-    stream.fill('0');
-    stream << std::hex << num;
-    return "0x" + std::string(stream.str());
 }
 
 /**

@@ -184,3 +184,38 @@ void logToFile(std::string& logData, std::string& logFilename,
 
     logFile.close();
 }
+
+/**
+ * @brief      Generates a random number between 0 and max value for unsigned
+ *
+ * @return     The generated random number (unsigned)
+ */
+unsigned genRandNum()
+{
+    // Get a random seed from the OS entropy device
+    std::random_device rd;
+
+    // Use the 64-bit Mersenne Twister 19937 generator and seed it with entropy
+    std::mt19937_64 eng(rd());  
+                                
+    // Define the distribution
+    std::uniform_int_distribution<unsigned> distr;
+
+    return distr(eng);
+}
+
+/**
+ * @brief      Converts an unsigned integer to a string in hexidecimal format
+ *
+ * @param[in]  num   The unsigned integer to convert
+ *
+ * @return     The resultant hex string after conversion
+ */
+std::string uintToHexStr(unsigned num)
+{
+    std::stringstream stream;
+    stream.width(8);
+    stream.fill('0');
+    stream << std::hex << num;
+    return "0x" + std::string(stream.str());
+}
