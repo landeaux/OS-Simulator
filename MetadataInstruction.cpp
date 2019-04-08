@@ -188,6 +188,14 @@ const std::string MetadataInstruction::toString() const
     return result;
 }
 
+/**
+ * @brief      Generate a string for logging purposes
+ *
+ * @param[in]  isStart  Indicates if start
+ * @param[in]  pid      The pid
+ *
+ * @return     The generated log string
+ */
 const std::string MetadataInstruction::genLogString(bool isStart, unsigned pid)
 {
     std::string result;

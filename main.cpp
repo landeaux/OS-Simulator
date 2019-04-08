@@ -7,6 +7,10 @@
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 3.04
+ *          Adam Landis (7 April 2019)
+ *          - Add semaphores for all I/O resources
+ * 
  * @version 3.03
  *          Adam Landis (7 April 2019)
  *          - Add support for semaphores
@@ -1257,6 +1261,15 @@ unsigned genRandNum()
     return distr(eng);
 }
 
+/**
+ * @brief      Executes a memory instruction
+ *
+ * @param[in]  instr         The instruction
+ * @param      nextBlockPtr  The next block pointer
+ * @param[in]  blockSize     The block size
+ * @param      memAddr       The memory address
+ * @param[in]  sysMem        The system memory
+ */
 void executeMemInstruction(
     MetadataInstruction instr, 
     unsigned &nextBlockPtr, 
@@ -1291,6 +1304,13 @@ void executeMemInstruction(
     pthread_mutex_unlock(&mutex);
 }
 
+/**
+ * @brief      Converts an unsigned integer to a string in hexidecimal format
+ *
+ * @param[in]  num   The unsigned integer to convert
+ *
+ * @return     The resultant hex string after conversion
+ */
 std::string uintToHexStr(unsigned num)
 {
     std::stringstream stream;
@@ -1300,6 +1320,13 @@ std::string uintToHexStr(unsigned num)
     return "0x" + std::string(stream.str());
 }
 
+/**
+ * @brief      Executes an IO instruction
+ *
+ * @param      param  The parameter holding the instruction
+ *
+ * @return     None
+ */
 void* executeIOInstruction(void* param)
 {
     MetadataInstruction instr = *((MetadataInstruction*)param);
