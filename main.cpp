@@ -127,6 +127,7 @@
 #include "Config.h"
 #include "PCB.h"
 #include "MetadataInstruction.h"
+#include "Metadata.h"
 #include "Timer.h"
 //
 // Global Constant Definitions /////////////////////////////////////////////////
@@ -150,6 +151,7 @@ const std::string METADATA_DESCRIPTORS[] = {
 // Global Variable Definitions /////////////////////////////////////////////////
 //
 Config *config;
+Metadata *metadata;
 pthread_mutex_t mutex;                          // mutex for memory mgmt
 sem_t semHD, semProj, semKB, semMon, semScan;   // semaphores for resource mgmt
 //
@@ -184,8 +186,6 @@ void* executeIOInstruction(void* param);
 //
 int main(int argc, char *argv[])
 {
-    srand(time(NULL));
-
     try
     {
         if (argc == 1)
@@ -193,17 +193,15 @@ int main(int argc, char *argv[])
             throw std::string("Error: missing argument for configuration file");
         }
 
-        std::string configFilename = argv[1];
-
+        std::string configFilename = argv[1], metadataFilename, logFilename;
         metadataQueue metaQueue;
-        std::string metadataFilename;
-
         std::ofstream logFile;
-        std::string logFilename;
 
         config = new Config(configFilename);
 
         metadataFilename = config->getSettingVal("File Path");
+
+        metadata = new Metadata(metadataFilename);
 
         if (metadataFilename.empty())
         {
