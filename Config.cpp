@@ -97,6 +97,74 @@ void Config::parseConfigFile(std::ifstream& configFile)
 }
 
 /**
+ * Logs configuration file data - either to file, monitor, or both
+ *
+ * @return  None
+ */
+void Config::logConfigFileData()
+{
+    std::string data = genConfigLogData();
+
+    logData(data);
+}
+
+/**
+ * Generates a single string containing config log data for logging to monitor,
+ * an output file, or both.
+ *
+ * @return  the generated string representing the log data
+ */
+std::string Config::genConfigLogData()
+{
+    std::string logData;
+
+    logData += "Configuration File Data\n";
+    logData += "Monitor = "       + this->config["Monitor"]       + " ms/cycle\n";
+    logData += "Processor = "     + this->config["Processor"]     + " ms/cycle\n";
+    logData += "Scanner = "       + this->config["Scanner"]       + " ms/cycle\n";
+    logData += "Hard Drive = "    + this->config["Hard drive"]    + " ms/cycle\n";
+    logData += "Keyboard = "      + this->config["Keyboard"]      + " ms/cycle\n";
+    logData += "Memory = "        + this->config["Memory"]        + " ms/cycle\n";
+    logData += "Projector = "     + this->config["Projector"]     + " ms/cycle\n";
+    logData += "System memory = " + this->config["System memory"] + " kbytes\n";
+
+    logData += "Logged to: ";
+    if (this->config["Log"] == "Log to Both") logData += "monitor and ";
+    logData += this->config["Log File Path"] + "\n\n";
+
+    return logData;
+}
+
+/**
+ * @brief      Logs a single string of data either to a file, monitor, or both
+ *
+ * @param[in]  data    The data
+ */
+void Config::logData(std::string data)
+{
+    std::string logType = this->config["Log"];
+    std::string logFilePath = this->config["Log File Path"];
+
+    if (logType == "Log to Monitor")
+    {
+        logToMonitor(data);
+    }
+    else if (logType == "Log to File")
+    {
+        logToFile(data, logFilePath);
+    }
+    else if (logType == "Log to Both")
+    {
+        logToMonitor(data);
+        logToFile(data, logFilePath);
+    }
+    else
+    {
+        throw std::string("Error: cannot log data - invalid or missing log type");
+    }
+}
+
+/**
  * Parses a given line in the config file and returns a key-value pair
  *
  * @param   configLine

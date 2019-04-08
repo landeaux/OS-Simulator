@@ -163,9 +163,6 @@ typedef std::queue<MetadataInstruction> metadataQueue;
 //
 void logData(configMap config, std::string data);
 
-void logConfigFileData(configMap config);
-std::string generateConfigLogData(configMap config);
-std::string getShortConfigSettingName(const std::string& longStr);
 configSetting getConfigSetting(const std::string& descriptor, configMap config);
 
 metadataQueue initializeMetadata(const std::string& filename, const configMap& config);
@@ -261,92 +258,6 @@ void logData(configMap config, std::string data)
     {
         throw std::string("Error: cannot log data - invalid or missing log type");
     }
-}
-
-/**
- * Logs configuration file data - either to file, monitor, or both
- *
- * @param   config
- *          The config map holding the configuration data to log
- *
- * @return  None
- */
-void logConfigFileData(configMap config)
-{
-    std::string data = generateConfigLogData(config);
-
-    logData(config, data);
-}
-
-/**
- * Generates a single string containing config log data for logging to monitor,
- * an output file, or both.
- *
- * @param   config
- *          The configMap object holding the configuration data to log
- *
- * @return  the generated string representing the log data
- */
-std::string generateConfigLogData(configMap config)
-{
-    std::string logData;
-
-    logData += "Configuration File Data\n";
-    logData += "Monitor = "       + config["Monitor"]       + " ms/cycle\n";
-    logData += "Processor = "     + config["Processor"]     + " ms/cycle\n";
-    logData += "Scanner = "       + config["Scanner"]       + " ms/cycle\n";
-    logData += "Hard Drive = "    + config["Hard drive"]    + " ms/cycle\n";
-    logData += "Keyboard = "      + config["Keyboard"]      + " ms/cycle\n";
-    logData += "Memory = "        + config["Memory"]        + " ms/cycle\n";
-    logData += "Projector = "     + config["Projector"]     + " ms/cycle\n";
-    logData += "System memory = " + config["System memory"] + " kbytes\n";
-
-    logData += "Logged to: ";
-    if (config["Log"] == "Log to Both") logData += "monitor and ";
-    logData += config["Log File Path"] + "\n\n";
-
-    return logData;
-}
-
-/**
- * Converts a long config setting name to a short one
- *
- * @param   longStr
- *          The longer string to shorten
- *
- * @return  The shortened string
- */
-std::string getShortConfigSettingName(const std::string& longStr)
-{
-    std::string result = longStr;
-
-    if (longStr != "Version/Phase" &&
-        longStr != "File Path" &&
-        longStr != "Log" &&
-        longStr != "Log File Path" &&
-        longStr.find("quantity") == std::string::npos)
-    {
-        if (longStr.find("Memory block size") != std::string::npos)
-        {
-            result = "Memory block size";
-        }
-        else
-        {
-            size_t end = longStr.find(' ');
-            result = longStr.substr(0, end);
-            
-            if (result == "Hard")
-            {
-                result += " drive";
-            }
-            else if (result == "System")
-            {
-                result += " memory";
-            }
-        }
-    }
-    
-    return result;
 }
 
 /**

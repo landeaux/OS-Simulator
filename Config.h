@@ -48,6 +48,10 @@ public:
     void validateConfigFile(std::ifstream& configFile);
     void parseConfigFile(std::ifstream& configFile);
     configSetting parseConfigLine(const std::string& configLine);
+    void logConfigFileData();
+    std::string genConfigLogData();
+    void logData(std::string data);
+
     std::string getShortConfigSettingName(const std::string& longStr);
     const configSetting getConfigSetting(const std::string& descriptor);
     
