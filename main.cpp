@@ -162,17 +162,17 @@ typedef std::queue<MetadataInstruction> metadataQueue;
 //
 // Free Function Prototypes ////////////////////////////////////////////////////
 //
-metadataQueue initializeMetadata(const std::string& filename, const configMap& config);
+metadataQueue initializeMetadata(const std::string& filename);
 void validateMetadataFile(std::ifstream& metadataFile, const std::string& filename);
-metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& config);
+metadataQueue parseMetadataFile(std::ifstream& metadataFile);
 MetadataInstruction parseMetadataInstruction(std::string& instructionStr);
 void validateMetadataCode(const char& code);
 void validateMetadataDescriptor(const std::string& descriptor);
 void validateMetadataCycles(const std::string& numCycles);
-void logMetadataFileData(const MetadataInstruction& instr, configMap config);
+void logMetadataFileData(const MetadataInstruction& instr);
 std::string generateMetadataLogData(MetadataInstruction instr);
 
-void startSimulation(configMap config, metadataQueue mdQueue);
+void startSimulation(metadataQueue mdQueue);
 void* wait(void* param);
 void wait(float duration);
 void executeMemInstruction(
@@ -195,8 +195,7 @@ int main(int argc, char *argv[])
         {
             throw std::string("Error: missing argument for configuration file");
         }
-
-        configMap config;
+        
         std::string configFilename = argv[1];
 
         metadataQueue metaQueue;
@@ -207,8 +206,6 @@ int main(int argc, char *argv[])
 
         myConfig = new Config(configFilename);
 
-        config = myConfig->getConfigMap();
-
         metadataFilename = myConfig->getSettingVal("File Path");
 
         if (metadataFilename.empty())
@@ -216,9 +213,9 @@ int main(int argc, char *argv[])
             throw std::string("Error: 'File Path' missing from config file");
         }
 
-        metaQueue = initializeMetadata(metadataFilename, config);
+        metaQueue = initializeMetadata(metadataFilename);
 
-        startSimulation(config, metaQueue);
+        startSimulation(metaQueue);
     }
     catch (std::string& e)
     {
@@ -239,18 +236,15 @@ int main(int argc, char *argv[])
  * @param   filename
  *          The filename of the metadata file to initialize
  *
- * @param   config
- *          The config map object containing all configuration settings
- *
  * @return  a queue containing metadata instructions
  */
-metadataQueue initializeMetadata(const std::string& filename, const configMap& config)
+metadataQueue initializeMetadata(const std::string& filename)
 {
     metadataQueue metaQueue;
     std::ifstream metadataFile(filename.c_str(), std::ios::in);
 
     validateMetadataFile(metadataFile, filename);
-    metaQueue = parseMetadataFile(metadataFile, config);
+    metaQueue = parseMetadataFile(metadataFile);
 
     metadataFile.close();
 
@@ -304,7 +298,7 @@ void validateMetadataFile(std::ifstream& metadataFile, const std::string& filena
  *
  * @return  a queue containing metadata instructions
  */
-metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& config)
+metadataQueue parseMetadataFile(std::ifstream& metadataFile)
 {
     metadataQueue metaQueue;
     std::string tempLine;
@@ -506,16 +500,14 @@ void validateMetadataCycles(const std::string& numCycles)
  * @param   instr
  *          The metadata instruction to be used in generating the log data
  *
- * @param   config
- *          The configMap object holding the configuration data which is used in
- *          processing the metadata file data to log
- *
  * @return  None
  */
-void logMetadataFileData(const MetadataInstruction& instr, configMap config)
+void logMetadataFileData(const MetadataInstruction& instr)
 {
     static bool beginLog = false;
     std::string logData;
+    std::string logType = myConfig->getSettingVal("Log");
+    std::string logFilePath = myConfig->getSettingVal("Log File Path");
 
     if (!beginLog)
     {
@@ -525,18 +517,18 @@ void logMetadataFileData(const MetadataInstruction& instr, configMap config)
 
     logData += generateMetadataLogData(instr);
 
-    if (config["Log"] == "Log to Monitor")
+    if (logType == "Log to Monitor")
     {
         logToMonitor(logData);
     }
-    else if (config["Log"] == "Log to File")
+    else if (logType == "Log to File")
     {
-        logToFile(logData, config["Log File Path"], std::ios_base::app);
+        logToFile(logData, logFilePath, std::ios_base::app);
     }
-    else if (config["Log"] == "Log to Both")
+    else if (logType == "Log to Both")
     {
         logToMonitor(logData);
-        logToFile(logData, config["Log File Path"], std::ios_base::app);
+        logToFile(logData, logFilePath, std::ios_base::app);
     }
     else
     {
@@ -576,7 +568,7 @@ std::string generateMetadataLogData(MetadataInstruction instr)
  * @param[in]  config   The configuration map
  * @param[in]  mdQueue  The queue of metadata instructions
  */
-void startSimulation(configMap config, metadataQueue mdQueue)
+void startSimulation(metadataQueue mdQueue)
 {
     Timer myTimer;
     float duration;
@@ -586,11 +578,11 @@ void startSimulation(configMap config, metadataQueue mdQueue)
              sysMem, memBlockSize, nextBlockPtr = 0,
              pid = 0;
 
-    numHD   = (unsigned) strToUnsignedLong(config["Hard drive quantity"]);
-    numProj = (unsigned) strToUnsignedLong(config["Projector quantity"]);
+    numHD   = (unsigned) strToUnsignedLong(myConfig->getSettingVal("Hard drive quantity"));
+    numProj = (unsigned) strToUnsignedLong(myConfig->getSettingVal("Projector quantity"));
 
-    sysMem       = (unsigned) strToUnsignedLong(config["System memory"]);
-    memBlockSize = (unsigned) strToUnsignedLong(config["Memory block size"]);
+    sysMem       = (unsigned) strToUnsignedLong(myConfig->getSettingVal("System memory"));
+    memBlockSize = (unsigned) strToUnsignedLong(myConfig->getSettingVal("Memory block size"));
 
     pthread_mutex_init(&mutex, NULL);
 
