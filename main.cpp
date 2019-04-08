@@ -152,6 +152,7 @@ const std::string METADATA_DESCRIPTORS[] = {
 //
 // Global Variable Definitions /////////////////////////////////////////////////
 //
+Config *myConfig;
 pthread_mutex_t mutex;                          // mutex for memory mgmt
 sem_t semHD, semProj, semKB, semMon, semScan;   // semaphores for resource mgmt
 //
@@ -208,11 +209,11 @@ int main(int argc, char *argv[])
         std::ofstream logFile;
         std::string logFilename;
 
-        Config myConfig(configFilename);
+        myConfig = new Config(configFilename);
 
-        config = myConfig.getConfigMap();
+        config = myConfig->getConfigMap();
 
-        metadataFilename = myConfig.getSettingVal("File Path");
+        metadataFilename = myConfig->getSettingVal("File Path");
         if (metadataFilename.empty())
         {
             throw std::string("Error: 'File Path' missing from config file");
