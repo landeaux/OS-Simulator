@@ -181,7 +181,6 @@ std::string generateMetadataLogData(MetadataInstruction instr, const configMap& 
 void startSimulation(configMap config, metadataQueue mdQueue);
 void* wait(void* param);
 void wait(float duration);
-unsigned genRandNum();
 void executeMemInstruction(
     MetadataInstruction instr, 
     unsigned &nextBlockPtr, 
@@ -189,7 +188,6 @@ void executeMemInstruction(
     unsigned &memAddr,
     unsigned sysMem);
 void* executeIOInstruction(void* param);
-std::string uintToHexStr(unsigned num);
 //
 // Main Function Implementation ////////////////////////////////////////////////
 //
