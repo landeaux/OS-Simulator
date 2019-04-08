@@ -1,7 +1,7 @@
 /**
  * @file MetadataInstruction.h
  * 
- * @brief Definition file for PCB MetadataInstruction class
+ * @brief Definition file for MetadataInstruction class
  * 
  * @details Specifies all member methods of the MetadataInstruction class
  * 
