@@ -8,6 +8,9 @@ Config.o:  Config.h Config.cpp
 MetadataInstruction.o:  MetadataInstruction.h MetadataInstruction.cpp
 	g++ -c $(CPPFLAGS) MetadataInstruction.cpp
 
+Metadata.o:  Metadata.h Metadata.cpp
+	g++ -c $(CPPFLAGS) Metadata.cpp
+
 PCB.o:  PCB.h PCB.cpp
 	g++ -c $(CPPFLAGS) PCB.cpp
 
@@ -17,9 +20,9 @@ Timer.o:  Timer.h Timer.cpp
 helpers.o:  helpers.h helpers.cpp
 	g++ -c $(CPPFLAGS) helpers.cpp
 
-sim:    helpers.o Config.o MetadataInstruction.o PCB.o Timer.o main.cpp
-	g++ -o sim3 $(CPPFLAGS) helpers.o Config.o MetadataInstruction.o PCB.o \
-	Timer.o main.cpp
+sim:    helpers.o Config.o MetadataInstruction.o Metadata.o PCB.o Timer.o main.cpp
+	g++ -o sim3 $(CPPFLAGS) helpers.o Config.o MetadataInstruction.o \
+	Metadata.o PCB.o Timer.o main.cpp
 
 clean:
 	rm -f sim3 *.o
