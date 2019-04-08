@@ -162,10 +162,6 @@ typedef std::queue<MetadataInstruction> metadataQueue;
 //
 // Free Function Prototypes ////////////////////////////////////////////////////
 //
-void logData(configMap config, std::string data);
-
-configSetting getConfigSetting(const std::string& descriptor, configMap config);
-
 metadataQueue initializeMetadata(const std::string& filename, const configMap& config);
 void validateMetadataFile(std::ifstream& metadataFile, const std::string& filename);
 metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& config);
@@ -174,7 +170,7 @@ void validateMetadataCode(const char& code);
 void validateMetadataDescriptor(const std::string& descriptor);
 void validateMetadataCycles(const std::string& numCycles);
 void logMetadataFileData(const MetadataInstruction& instr, configMap config);
-std::string generateMetadataLogData(MetadataInstruction instr, const configMap& config);
+std::string generateMetadataLogData(MetadataInstruction instr);
 
 void startSimulation(configMap config, metadataQueue mdQueue);
 void* wait(void* param);
@@ -214,10 +210,12 @@ int main(int argc, char *argv[])
         config = myConfig->getConfigMap();
 
         metadataFilename = myConfig->getSettingVal("File Path");
+
         if (metadataFilename.empty())
         {
             throw std::string("Error: 'File Path' missing from config file");
         }
+
         metaQueue = initializeMetadata(metadataFilename, config);
 
         startSimulation(config, metaQueue);
@@ -233,71 +231,6 @@ int main(int argc, char *argv[])
 //
 // Free Function Implementation ////////////////////////////////////////////////
 //
-
-/**
- * @brief      Logs a single string of data either to a file, monitor, or both
- *
- * @param[in]  config  The configuration
- * @param[in]  data    The data
- */
-void logData(configMap config, std::string data)
-{
-    if (config["Log"] == "Log to Monitor")
-    {
-        logToMonitor(data);
-    }
-    else if (config["Log"] == "Log to File")
-    {
-        logToFile(data, config["Log File Path"]);
-    }
-    else if (config["Log"] == "Log to Both")
-    {
-        logToMonitor(data);
-        logToFile(data, config["Log File Path"]);
-    }
-    else
-    {
-        throw std::string("Error: cannot log data - invalid or missing log type");
-    }
-}
-
-/**
- * Gets the config setting for a given metadata instruction descriptor
- *
- * @param   descriptor
- *          The given metadata instruction descriptor to find the config setting
- *          for
- *
- * @param   config
- *          configMap object which holds all of the configuration settings
- *
- * @return  The config setting which corresponds to the given metadata
- *          instruction descriptor (configSetting)
- */
-configSetting getConfigSetting(const std::string& descriptor, configMap config)
-{
-    configSetting setting;
-
-    if (descriptor == "block" || descriptor == "allocate")
-    {
-        setting.key = "Memory";
-        setting.value = config["Memory"];
-    }
-    else if (descriptor == "run")
-    {
-        setting.key = "Processor";
-        setting.value = config["Processor"];
-    }
-    else
-    {
-        std::string key = descriptor;
-        key[0] = (char) toupper(key[0]);
-        setting.key = key;
-        setting.value = config[key];
-    }
-
-    return setting;
-}
 
 /**
  * Initializes metadata (i.e. opens, validates, parses, and closes a metadata
@@ -411,7 +344,7 @@ metadataQueue parseMetadataFile(std::ifstream& metadataFile, const configMap& co
 
                 MetadataInstruction instr = parseMetadataInstruction(tempInstr);
 
-                configSetting setting = getConfigSetting(instr.getDescriptor(), config);
+                configSetting setting = myConfig->getConfigSetting(instr.getDescriptor());
                 unsigned long cycleTime = strToUnsignedLong(setting.value);
                 instr.setWaitTime(cycleTime);
 
@@ -590,7 +523,7 @@ void logMetadataFileData(const MetadataInstruction& instr, configMap config)
         beginLog = true;
     }
 
-    logData += generateMetadataLogData(instr, config);
+    logData += generateMetadataLogData(instr);
 
     if (config["Log"] == "Log to Monitor")
     {
@@ -618,19 +551,15 @@ void logMetadataFileData(const MetadataInstruction& instr, configMap config)
  * @param   instr
  *          The metadata instruction to be used in generating the log data
  *
- * @param   config
- *          The configMap object holding the configuration data which is used in
- *          processing the metadata file data to log
- *
  * @return  the generated metadata log string
  */
-std::string generateMetadataLogData(MetadataInstruction instr, const configMap& config)
+std::string generateMetadataLogData(MetadataInstruction instr)
 {
     std::string result;
 
     if (instr.getNumCycles() > 0)
     {
-        configSetting setting = getConfigSetting(instr.getDescriptor(), config);
+        configSetting setting = myConfig->getConfigSetting(instr.getDescriptor());
 
         unsigned long cycleTime = strToUnsignedLong(setting.value);
         std::string totalTime = std::to_string(instr.getNumCycles() * cycleTime);
@@ -708,7 +637,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 
         data += "\n";
 
-        logData(config, data);
+        myConfig->logData(data);
 
         if (code == 'I' || code == 'O')
         {
@@ -752,13 +681,13 @@ void startSimulation(configMap config, metadataQueue mdQueue)
 
             data += "\n";
             
-            logData(config, data);
+            myConfig->logData(data);
         }
 
         mdQueue.pop();
     }
 
-    logData(config, "\n");
+    myConfig->logData("\n");
 }
 
 /**
