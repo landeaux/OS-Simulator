@@ -6,7 +6,7 @@
  * @details Specifies all member methods of the Metadata class
  * 
  * @version 1.00
- *          Adam Landis (7 April 2019)
+ *          Adam Landis (8 April 2019)
  *          Initial development and testing of Metadata class
  * 
  * @note None
