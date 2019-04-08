@@ -13,12 +13,12 @@ make
 
 To run the program, use the following command from the program directory, and in place of "\<filename>\", provide a configuration file as an argument. (NOTE: the configuration file must have the extension ".conf"):
 ```
-./sim2 <filename>
+./sim3 <filename>
 ```
 
 ## Mutex and Semaphores
 
-Version 3.0 introduces the use of pthread mutex and semaphores for mutual exclusion and resource management. All mutex and semaphore statements can be found in __main.cpp__. The mutex is defined on __line 166__, initialized on __line 1082__, and the mutex lock and unlock statements are found on __lines 1218 and 1238__, respectively. The semaphores are defined on __line 167__, initialized on __lines 1084 - 1085__, and the sem_wait() and sem_post() calls are made on __lines 1266 and 1270__, respectively.
+Version 3.0 introduces the use of pthread mutex and semaphores for mutual exclusion and resource management. All mutex and semaphore statements can be found in __main.cpp__. The mutex is defined on __line 165__, initialized on __line 1113__, and the mutex lock and unlock statements are found on __lines 1269 and 1291__, respectively. The semaphores are defined on __line 166__, initialized on __lines 1115 - 1119__, and the sem_wait() and sem_post() calls are made on __lines 1311 and 1315__, respectively.
 
 ## Pthreads
 
