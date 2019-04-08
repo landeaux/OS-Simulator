@@ -8,7 +8,7 @@ Config.o:  Config.h Config.cpp
 MetadataInstruction.o:  MetadataInstruction.h MetadataInstruction.cpp
 	g++ -c $(CPPFLAGS) MetadataInstruction.cpp
 
-Metadata.o:  Metadata.h Metadata.cpp
+Metadata.o:  MetadataInstruction.h Metadata.h Metadata.cpp
 	g++ -c $(CPPFLAGS) Metadata.cpp
 
 PCB.o:  PCB.h PCB.cpp
