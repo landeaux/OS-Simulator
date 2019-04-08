@@ -125,7 +125,6 @@
 //
 // Global Constant Definitions /////////////////////////////////////////////////
 //
-const unsigned UINT_MAX = std::numeric_limits<unsigned>::max();
 const std::string CONFIG_HEADER = "Start Simulator Configuration File";
 const std::string CONFIG_FOOTER = "End Simulator Configuration File";
 const std::string CONFIG_SETTING_NAMES[] = {
@@ -218,7 +217,12 @@ void startSimulation(configMap config, metadataQueue mdQueue);
 void* wait(void* param);
 void wait(float duration);
 unsigned genRandNum();
-void executeMemInstruction(MetadataInstruction instr, unsigned &nextBlockPtr, unsigned blockSize, unsigned &memAddr);
+void executeMemInstruction(
+    MetadataInstruction instr, 
+    unsigned &nextBlockPtr, 
+    unsigned blockSize, 
+    unsigned &memAddr,
+    unsigned sysMem);
 void* executeIOInstruction(void* param);
 std::string uintToHexStr(unsigned num);
 //
@@ -1097,13 +1101,14 @@ void startSimulation(configMap config, metadataQueue mdQueue)
     PCB* pcb;
     unsigned numHD, countHD = 0,
              numProj, countProj = 0,
-             memBlockSize, nextBlockPtr = 0,
+             sysMem, memBlockSize, nextBlockPtr = 0,
              pid = 0;
 
     numHD   = (unsigned) strToUnsignedLong(config["Hard drive quantity"]);
     numProj = (unsigned) strToUnsignedLong(config["Projector quantity"]);
 
-    memBlockSize = (unsigned) strToUnsignedLong(config["Memory block size"]);    
+    sysMem       = (unsigned) strToUnsignedLong(config["System memory"]);
+    memBlockSize = (unsigned) strToUnsignedLong(config["Memory block size"]);
 
     pthread_mutex_init(&mutex, NULL);
 
@@ -1163,7 +1168,7 @@ void startSimulation(configMap config, metadataQueue mdQueue)
         }
         else if (code == 'M')
         {
-            executeMemInstruction(instr, nextBlockPtr, memBlockSize, memAddr);
+            executeMemInstruction(instr, nextBlockPtr, memBlockSize, memAddr, sysMem);
         }
         else
         {
@@ -1252,7 +1257,12 @@ unsigned genRandNum()
     return distr(eng);
 }
 
-void executeMemInstruction(MetadataInstruction instr, unsigned &nextBlockPtr, unsigned blockSize, unsigned &memAddr)
+void executeMemInstruction(
+    MetadataInstruction instr, 
+    unsigned &nextBlockPtr, 
+    unsigned blockSize, 
+    unsigned &memAddr,
+    unsigned sysMem)
 {
     std::string descriptor = instr.getDescriptor();
 
@@ -1260,7 +1270,7 @@ void executeMemInstruction(MetadataInstruction instr, unsigned &nextBlockPtr, un
 
     if (descriptor == "allocate")
     {
-        if (UINT_MAX - nextBlockPtr >= blockSize)
+        if (sysMem - nextBlockPtr >= blockSize)
         {
             memAddr = nextBlockPtr;
             nextBlockPtr += blockSize;
