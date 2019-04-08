@@ -109,11 +109,12 @@
  * operations to perform in the OS simulator.
  *
  */
+
 // Header Files ////////////////////////////////////////////////////////////////
 //
 #include <iostream>     // cout
 #include <iomanip>      // setprecision, fixed
-#include <fstream>      // ofstream
+#include <fstream>      // ifstream, ofstream
 #include <string>       // string, to_string
 #include <sstream>      // stringstream
 #include <map>          // for the configutation settings
@@ -123,6 +124,8 @@
 #include <random>       // for generating random numbers
 #include <limits>       // for generating random numbers
 
+#include "helpers.h"
+#include "Config.h"
 #include "PCB.h"
 #include "MetadataInstruction.h"
 #include "Timer.h"
@@ -169,17 +172,6 @@ const std::string METADATA_DESCRIPTORS[] = {
 pthread_mutex_t mutex;                          // mutex for memory mgmt
 sem_t semHD, semProj, semKB, semMon, semScan;   // semaphores for resource mgmt
 //
-// Class/Struct Definitions ////////////////////////////////////////////////////
-//
-/**
- * Struct to hold a single key-value pair for a config setting
- */
-struct configSetting
-{
-    std::string key;
-    std::string value;
-};
-//
 // Typedefs ////////////////////////////////////////////////////////////////////
 //
 typedef std::map<std::string, std::string> configMap;
@@ -187,9 +179,6 @@ typedef std::queue<MetadataInstruction> metadataQueue;
 //
 // Free Function Prototypes ////////////////////////////////////////////////////
 //
-bool isValidFileExtension(const std::string& filename, const std::string& ext);
-bool isEmptyFile(std::ifstream& file);
-bool isPositiveInteger(const std::string& str);
 bool isNonNegativeInteger(const std::string& str);
 std::string stripSpaces(const std::string& s);
 unsigned long strToUnsignedLong(const std::string& str);
@@ -198,10 +187,6 @@ void logToFile(std::string& logData, std::string& logFilename,
                std::ios_base::openmode mode = std::ios_base::app);
 void logData(configMap config, std::string data);
 
-configMap initializeConfig(const std::string& filename);
-void validateConfigFile(std::ifstream& configFile, const std::string& filename);
-configMap parseConfigFile(std::ifstream& configFile);
-configSetting parseConfigLine(const std::string& configLine);
 void logConfigFileData(configMap config);
 std::string generateConfigLogData(configMap config);
 std::string getShortConfigSettingName(const std::string& longStr);
@@ -252,9 +237,11 @@ int main(int argc, char *argv[])
         std::ofstream logFile;
         std::string logFilename;
 
-        config = initializeConfig(configFilename);
+        Config myConfig(configFilename);
 
-        metadataFilename = config["File Path"];
+        config = myConfig.getConfigMap();
+
+        metadataFilename = myConfig.getSettingVal("File Path");
         if (metadataFilename.empty())
         {
             throw std::string("Error: 'File Path' missing from config file");
@@ -274,62 +261,6 @@ int main(int argc, char *argv[])
 //
 // Free Function Implementation ////////////////////////////////////////////////
 //
-/**
- * Checks if a filename contains a specified extension
- *
- * @param   filename
- *          The filename to validate
- *
- * @param   extension
- *          The extension to check for
- *
- * @return  success of validation (bool)
- */
-bool isValidFileExtension(const std::string& filename, const std::string& ext)
-{
-    unsigned long flnLen = filename.length();
-    unsigned long extLen = ext.length();
-    size_t extLoc = filename.rfind('.' + ext);
-
-    // if extension found in string and extension is at the end, return true
-    return ((extLoc != std::string::npos) && (extLen + extLoc + 1 == flnLen));
-}
-
-/**
- * Check if a file is empty
- *
- * @param   file
- *          The file to check
- *
- * @return  true if file is empty, false otherwise
- */
-bool isEmptyFile(std::ifstream& file)
-{
-    return file.peek() == std::ifstream::traits_type::eof();
-}
-
-/**
- * Checks if a given string is a positive integer or not.
- *
- * Credit: Code adapted from https://stackoverflow.com/a/2845275
- *
- * @param   str
- *          The string to check
- *
- * @return  true if string is a positive integer, false otherwise
- */
-bool isPositiveInteger(const std::string& str)
-{
-    if(str.empty() || (!isdigit(str[0])))
-    {
-        return false;
-    }
-
-    char * p;
-    long int num = strtol(str.c_str(), &p, 10);
-
-    return (*p == 0 && num != 0);
-}
 
 /**
  * Checks if a given string is a non-negative integer or not.
@@ -462,168 +393,6 @@ void logData(configMap config, std::string data)
     {
         throw std::string("Error: cannot log data - invalid or missing log type");
     }
-}
-
-/**
- * @brief   Function to initialize OS Configuration
- *
- * @detail  Opens specified config file, validates the file, and parses the file
- *
- * @param   filename
- *          The config file to initialize the configuration from
- *
- * @return  Associative array (map) containing the key-value pairs for
- *          configuration settings
- */
-configMap initializeConfig(const std::string& filename)
-{
-    configMap config;
-    std::ifstream configFile(filename.c_str(), std::ios::in);
-
-    validateConfigFile(configFile, filename);
-    config = parseConfigFile(configFile);
-
-    configFile.close();
-
-    return config;
-}
-
-/**
- * Checks the validity of a configuration file (correct extension, non-empty)
- *
- * @param   configFile
- *          The config file to validate (ifstream)
- *
- * @param   filename
- *          The filename of the config file (string)
- *
- * @return  None
- */
-void validateConfigFile(std::ifstream& configFile, const std::string& filename)
-{
-    // make sure file exists
-    if (!configFile.good())
-    {
-        throw std::string("Error: config file \"" + filename + "\" does not exist");
-    }
-
-    // make sure file has correct extension
-    if (!isValidFileExtension(filename, "conf")) {
-        throw std::string("Error: invalid extension for config file");
-    }
-
-    // make sure file is not empty
-    if (isEmptyFile(configFile)) {
-        configFile.close();
-        throw std::string("Error: config file empty");
-    }
-
-    std::string header;
-    getline(configFile, header);
-
-    // make sure the 1st line in file matches correct config file header
-    if (header != CONFIG_HEADER)
-    {
-        throw std::string("Error: invalid config file header");
-    }
-}
-
-/**
- * Parses the config file and reads in the config values to an associative array
- *
- * @param   configFile
- *          The config file to parse
- *
- * @return  The associative array containing the config key-value pairs (map)
- */
-configMap parseConfigFile(std::ifstream& configFile)
-{
-    configMap config;
-    std::string tempLine;
-    configSetting tempSetting;
-
-    while (!configFile.eof() && tempLine != CONFIG_FOOTER)
-    {
-        getline(configFile, tempLine);
-        if (tempLine != CONFIG_FOOTER)
-        {
-            tempSetting = parseConfigLine(tempLine);
-            config[tempSetting.key] = tempSetting.value;
-        }
-    }
-
-    return config;
-}
-
-/**
- * Parses a given line in the config file and returns a key-value pair
- *
- * @param   configLine
- *          The current line in the config file to parse
- *
- * @return  key-value pair representing the config setting
- */
-configSetting parseConfigLine(const std::string& configLine)
-{
-    configSetting setting;
-    std::string settingKey;
-    std::string settingValue;
-    unsigned long lineLen = configLine.length();
-    unsigned long i = 0;
-
-    while (configLine[++i] != ':' && i < lineLen);
-
-    if (i >= lineLen)
-    {
-        throw std::string("Error: unable to parse config file");
-    }
-
-    settingKey = configLine.substr(0, i);
-    bool settingFound = false;
-
-    for (const std::string& name: CONFIG_SETTING_NAMES)
-    {
-        if (settingKey == name)
-        {
-            settingFound = true;
-        }
-    }
-
-    if (!settingFound)
-    {
-        throw std::string("Error: invalid setting \"" + settingKey + "\"");
-    }
-
-    setting.key = getShortConfigSettingName(settingKey);
-
-    if (configLine[++i] != ' ')
-    {
-        throw std::string("Error: unable to parse config file");
-    }
-
-    while (configLine[++i] == ' ' && i < lineLen);
-
-    if (i >= lineLen)
-    {
-        throw std::string("Error: unable to parse config file");
-    }
-
-    settingValue = configLine.substr(i, lineLen - i);
-
-    if (setting.key != "Version/Phase" &&
-        setting.key != "File Path" &&
-        setting.key != "Log" &&
-        setting.key != "Log File Path")
-    {
-        if (!isPositiveInteger(settingValue))
-        {
-            throw std::string("Error: invalid cycle/display time \"" + settingValue + "\"");
-        }
-    }
-
-    setting.value = settingValue;
-
-    return setting;
 }
 
 /**
