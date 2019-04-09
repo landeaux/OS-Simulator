@@ -20,7 +20,7 @@ Timer.o:  Timer.h Timer.cpp
 helpers.o:  helpers.h helpers.cpp
 	g++ -c $(CPPFLAGS) helpers.cpp
 
-Simulation.o:  Config.h Metadata.h PCB.h Timer.h Simulation.h Simulation.cpp
+Simulation.o:  Config.h MetadataInstruction.h Metadata.h PCB.h Timer.h Simulation.h Simulation.cpp
 	g++ -c $(CPPFLAGS) Simulation.cpp
 
 sim:    helpers.o Config.o MetadataInstruction.o Metadata.o PCB.o Timer.o Simulation.o main.cpp
