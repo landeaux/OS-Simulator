@@ -46,6 +46,8 @@ public:
     void logMetadataFileData(const MetadataInstruction& instr);
     std::string generateMetadataLogData(MetadataInstruction instr);
 
+    void setSemPtrs(sem_t *semHD, sem_t *semProj, sem_t *semKB, sem_t *semMon, sem_t *semScan);
+
     /**
      * @brief      Gets the metadata instruction queue.
      *
@@ -71,6 +73,7 @@ private:
         "projector",
         "block",
     };
+    sem_t *semHD, *semProj, *semKB, *semMon, *semScan;
 };
 //
 // Terminating Precompiler Directives
