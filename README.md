@@ -18,12 +18,12 @@ To run the program, use the following command from the program directory, and in
 
 ## Mutex and Semaphores
 
-Version 3.0 introduces the use of pthread mutex and semaphores for mutual exclusion and resource management. All mutex and semaphore statements can be found in __main.cpp__. The mutex is defined on __line 165__, initialized on __line 1113__, and the mutex lock and unlock statements are found on __lines 1269 and 1291__, respectively. The semaphores are defined on __line 166__, initialized on __lines 1115 - 1119__, and the sem_wait() and sem_post() calls are made on __lines 1311 and 1315__, respectively.
+Version 3.0 introduces the use of pthread mutex and semaphores for mutual exclusion and resource management. All mutex and semaphore statements can be found in __Simulation.cpp__. The mutex is defined on __line 21__, initialized on __line 67__, and the mutex lock and unlock statements are found on __lines 217 and 239__, respectively. The semaphores are defined on __line 22__, initialized on __lines 69 - 73__, and the sem_wait() and sem_post() calls are made on __lines 257 and 261__, respectively.
 
 ## Pthreads
 
-Version 2.0 of the OS-Simulator introduces pthreads for a threaded wait() timer function. The location of the created threads is in __main.cpp__ at __line 1052__ (in the startSimulation() function).
+Version 2.0 of the OS-Simulator introduces pthreads for a threaded wait() timer function. The location for created threads is in __Simulation.cpp__ at __line 129__ of the Simulation::startSimulation() function.
 
 ## PCB (Process Control Block)
 
-Version 2.0 of the OS-Simulator also introduces the use of a PCB object to simulate a process control block. The class specification and implementation can be found in __PCB.h__ and __PCB.cpp__, respectively. A PCB* object is defined in __main.cpp__ at the beginning of the __startSimulation()__ function (__line 1018__) and allocated a new PCB object when a new process is created (__line 1036__).
+Version 2.0 of the OS-Simulator also introduces the use of a PCB object to simulate a process control block. The class specification and implementation can be found in __PCB.h__ and __PCB.cpp__, respectively. A PCB* object is defined in __Simulation.cpp__ at the beginning of the __Simulation::startSimulation()__ function (__line 55__) and allocated a new PCB object when a new process is created (__line 90__).
