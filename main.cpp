@@ -7,6 +7,13 @@
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 3.06
+ *          Adam Landis (8 April 2019)
+ *          - Move all Metadata-related instructions and data into Metadata.h
+ *            and Metadata.cpp files for Metadata class
+ *          - Move all Simulation-related instructions and data into Simulation.h
+ *            and Simulation.cpp files for Simulation class
+ * 
  * @version 3.05
  *          Adam Landis (8 April 2019)
  *          Update to utilize new Config class and moved all helper functions to
