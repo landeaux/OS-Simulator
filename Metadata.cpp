@@ -122,28 +122,23 @@ void Metadata::parseMetadataFile(std::ifstream& metadataFile)
 
                 if (descriptor == "hard drive")
                 {
-                    // instr.setSemPtr(&semHD);
-                    instr.setSemPtr(NULL);
+                    instr.setSemPtr(this->semHD);
                 }
                 else if (descriptor == "projector")
                 {
-                    // instr.setSemPtr(&semProj);
-                    instr.setSemPtr(NULL);
+                    instr.setSemPtr(this->semProj);
                 }
                 else if (descriptor == "keyboard")
                 {
-                    // instr.setSemPtr(&semKB);
-                    instr.setSemPtr(NULL);
+                    instr.setSemPtr(this->semKB);
                 }
                 else if (descriptor == "monitor")
                 {
-                    // instr.setSemPtr(&semMon);
-                    instr.setSemPtr(NULL);
+                    instr.setSemPtr(this->semMon);
                 }
                 else if (descriptor == "scanner")
                 {
-                    // instr.setSemPtr(&semScan);
-                    instr.setSemPtr(NULL);
+                    instr.setSemPtr(this->semScan);
                 }
 
                 mdQueue.push(instr);
@@ -339,4 +334,22 @@ std::string Metadata::generateMetadataLogData(MetadataInstruction instr)
     }
 
     return result;
+}
+
+/**
+ * @brief      Sets the semaphore pointers.
+ *
+ * @param      semHD    The HDD semaphore
+ * @param      semProj  The PROJ semaphore
+ * @param      semKB    The Keyboard semaphore
+ * @param      semMon   The Monitor semaphore
+ * @param      semScan  The Scanner semaphore
+ */
+void Metadata::setSemPtrs(sem_t *semHD, sem_t *semProj, sem_t *semKB, sem_t *semMon, sem_t *semScan)
+{
+    this->semHD = semHD;
+    this->semProj = semProj;
+    this->semKB = semKB;
+    this->semMon = semMon;
+    this->semScan = semScan;
 }
