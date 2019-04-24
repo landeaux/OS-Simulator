@@ -5,6 +5,13 @@
  * 
  * @details Specifies all member methods of the PCB class
  * 
+ * @version 1.03
+ *          Adam Landis (24 April 2019)
+ *          - Change name of setProgramCounter() and getProgramCounter() to 
+ *            setPC() and getPC()
+ *          - Add copy constructor, overloaded assignement operator, and 
+ *            destructor
+ * 
  * @version 1.02
  *          Adam Landis (14 March 2019)
  *          - Add data member pc.
@@ -44,11 +51,14 @@ class PCB
 public:
     PCB();
     PCB(unsigned int pid);
+    PCB(const PCB &obj);
+    PCB& operator=(const PCB &rhs);
+    ~PCB();
     void setState(State state);
-    void setProgramCounter(unsigned int pc);
+    void setPC(unsigned int pc);
     const State getState() const;
     const unsigned int getPID() const;
-    const unsigned int getProgramCounter() const;
+    const unsigned int getPC() const;
 private:
     unsigned int pid;
     unsigned int pc;
