@@ -180,16 +180,23 @@ configSetting Config::parseConfigLine(const std::string& configLine)
     unsigned long lineLen = configLine.length();
     unsigned long i = 0;
 
+    // Find index of first ':' char
     while (configLine[++i] != ':' && i < lineLen);
 
-    if (i >= lineLen)
+    if (i >= lineLen) // if ':' char not found in configLine
     {
         throw std::string("Error: unable to parse config file");
     }
 
-    settingKey = configLine.substr(0, i);
-    bool settingFound = false;
+    // Find index of first non-space char before ':'
+    int j = i;
+    while (configLine[--j] == ' ' && j > 0);
+    j++;
 
+    settingKey = configLine.substr(0, j);
+
+    // Check if the string is a valid config setting key
+    bool settingFound = false;
     for (const std::string& name: CONFIG_SETTING_NAMES)
     {
         if (settingKey == name)
@@ -222,7 +229,8 @@ configSetting Config::parseConfigLine(const std::string& configLine)
     if (setting.key != "Version/Phase" &&
         setting.key != "File Path" &&
         setting.key != "Log" &&
-        setting.key != "Log File Path")
+        setting.key != "Log File Path" &&
+        setting.key != "CPU Scheduling Code")
     {
         if (!isPositiveInteger(settingValue))
         {
@@ -251,6 +259,8 @@ std::string Config::getShortConfigSettingName(const std::string& longStr)
         longStr != "File Path" &&
         longStr != "Log" &&
         longStr != "Log File Path" &&
+        longStr != "CPU Scheduling Code" &&
+        longStr != "Processor Quantum Number" &&
         longStr.find("quantity") == std::string::npos)
     {
         if (longStr.find("Memory block size") != std::string::npos)

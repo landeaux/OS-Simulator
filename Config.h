@@ -75,7 +75,7 @@ private:
     configMap config;
     const std::string CONFIG_HEADER = "Start Simulator Configuration File";
     const std::string CONFIG_FOOTER = "End Simulator Configuration File";
-    const std::string CONFIG_SETTING_NAMES[15] = {
+    const std::string CONFIG_SETTING_NAMES[17] = {
             "Version/Phase",
             "File Path",
             "Monitor display time {msec}",
@@ -90,7 +90,9 @@ private:
             "Projector quantity",
             "Hard drive quantity",
             "Log",
-            "Log File Path"
+            "Log File Path",
+            "Processor Quantum Number",
+            "CPU Scheduling Code"
     };
 };
 //
