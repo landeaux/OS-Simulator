@@ -5,6 +5,10 @@
  * 
  * @details Implements all member methods of Simulation class
  * 
+ * @version 1.01
+ *          Adam Landis (24 April 2019)
+ *          Add global constant CPU_SCHEDULING_CODES
+ * 
  * @version 1.00
  *          Adam Landis (8 March 2019)
  *          Initial development and testing of Simulation class
@@ -15,6 +19,10 @@
 // Header Files ////////////////////////////////////////////////////////////////
 //
 #include "Simulation.h"
+//
+// Global Constant Definitions /////////////////////////////////////////////////
+// 
+const std::string CPU_SCHEDULING_CODES[3] = { "FIFO", "PS", "SJF" };
 //
 // Global Variable Definitions /////////////////////////////////////////////////
 //
