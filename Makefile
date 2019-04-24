@@ -14,18 +14,21 @@ Metadata.o:  MetadataInstruction.h Metadata.h Metadata.cpp
 PCB.o:  PCB.h PCB.cpp
 	g++ -c $(CPPFLAGS) PCB.cpp
 
+Process.o:  Process.h Process.cpp
+	g++ -c $(CPPFLAGS) Process.cpp
+
 Timer.o:  Timer.h Timer.cpp
 	g++ -c $(CPPFLAGS) Timer.cpp
 
 helpers.o:  helpers.h helpers.cpp
 	g++ -c $(CPPFLAGS) helpers.cpp
 
-Simulation.o:  Config.h MetadataInstruction.h Metadata.h PCB.h Timer.h Simulation.h Simulation.cpp
+Simulation.o:  Config.h MetadataInstruction.h Metadata.h PCB.h Process.h Timer.h Simulation.h Simulation.cpp
 	g++ -c $(CPPFLAGS) Simulation.cpp
 
-sim:    helpers.o Config.o MetadataInstruction.o Metadata.o PCB.o Timer.o Simulation.o main.cpp
+sim:    helpers.o Config.o MetadataInstruction.o Metadata.o PCB.o Process.o Timer.o Simulation.o main.cpp
 	g++ -o sim3 $(CPPFLAGS) helpers.o Config.o MetadataInstruction.o \
-	Metadata.o PCB.o Timer.o Simulation.o main.cpp
+	Metadata.o PCB.o Process.o Timer.o Simulation.o main.cpp
 
 clean:
 	rm -f sim3 *.o
