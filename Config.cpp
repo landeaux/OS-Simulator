@@ -5,6 +5,11 @@
  * 
  * @details Implements all member methods of Config class
  * 
+ * @version 1.01
+ *          Adam Landis (24 April 2019)
+ *          Add support for new config settings "Processor Quantum Number" and 
+ *          "CPU Scheduling Code"
+ *          
  * @version 1.00
  *          Adam Landis (8 March 2019)
  *          Initial development and testing of Config class
