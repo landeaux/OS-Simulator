@@ -5,6 +5,11 @@
  * 
  * @details Specifies all member methods of the Process class
  * 
+ * @version 1.01
+ *          Adam Landis (24 April 2019)
+ *          - Add data member instrVector to hold all instructions for the 
+ *            process
+ * 
  * @version 1.00
  *          Adam Landis (24 April 2019)
  *          Initial development and testing of Process class
@@ -19,7 +24,9 @@
 //
 // Header Files ////////////////////////////////////////////////////////////////
 // 
-///// None
+#include <vector> // for instruction vector
+
+#include "MetadataInstruction.h"
 //
 // Global Constant Definitions /////////////////////////////////////////////////
 // 
@@ -38,6 +45,7 @@ public:
     const unsigned int getPID() const;
 private:
     unsigned int pid;
+    std::vector<MetadataInstruction> instrVector;
 };
 //
 // Terminating Precompiler Directives
