@@ -27,8 +27,8 @@ Simulation.o:  Config.h MetadataInstruction.h Metadata.h PCB.h Process.h Timer.h
 	g++ -c $(CPPFLAGS) Simulation.cpp
 
 sim:    helpers.o Config.o MetadataInstruction.o Metadata.o PCB.o Process.o Timer.o Simulation.o main.cpp
-	g++ -o sim3 $(CPPFLAGS) helpers.o Config.o MetadataInstruction.o \
+	g++ -o sim4 $(CPPFLAGS) helpers.o Config.o MetadataInstruction.o \
 	Metadata.o PCB.o Process.o Timer.o Simulation.o main.cpp
 
 clean:
-	rm -f sim3 *.o
+	rm -f sim4 *.o
