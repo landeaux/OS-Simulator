@@ -5,6 +5,10 @@
  * 
  * @details Specifies all member methods of the Simulation class
  * 
+ * @version 1.02
+ *          Adam Landis (24 April 2019)
+ *          Add method prototype createProcesses()
+ * 
  * @version 1.01
  *          Adam Landis (24 April 2019)
  *          Add data members readyQueue, waitQueue, and processVector
@@ -58,6 +62,7 @@ public:
     Simulation(const std::string& configFilename);
 
     void startSimulation();
+    void createProcesses();
 private:
     std::string configFilename;
     Config *config;

@@ -5,6 +5,10 @@
  * 
  * @details Implements all member methods of Simulation class
  * 
+ * @version 1.02
+ *          Adam Landis (24 April 2019)
+ *          Implement basic, unfinished version of createProcesses() method
+ * 
  * @version 1.01
  *          Adam Landis (24 April 2019)
  *          Add global constant CPU_SCHEDULING_CODES
@@ -95,7 +99,7 @@ void Simulation::startSimulation()
         
         if (code == 'A' && descriptor == "begin")
         {
-            pcb = new PCB(++pid);
+            pcb = new PCB(++pid, 0, 0);
             pcb->setState(START);
         }
         else if (code == 'P')
@@ -168,6 +172,48 @@ void Simulation::startSimulation()
     }
 
     this->config->logData("\n");
+}
+
+void Simulation::createProcesses()
+{
+    int i = 1;
+    metadataQueue mdQueueCopy = this->metadata->getMetadataQueue();
+
+    while (!mdQueueCopy.empty())
+    {
+        MetadataInstruction instr = mdQueueCopy.front();
+        
+        if (instr.toString() == "A{begin}0")
+        {
+            mdQueueCopy.pop();
+            
+            // Create new Process
+            Process process(i);
+            std::vector<MetadataInstruction> instrVector;
+
+            instr = mdQueueCopy.front();
+
+            while (instr.toString() != "A{finish}0")
+            {
+                instrVector.push_back(instr);
+
+                mdQueueCopy.pop();
+                instr = mdQueueCopy.front();
+            }
+            process.setInstrVector(instrVector);
+            // END Create new Process
+
+            this->processVector.push_back(process);
+
+            // Create new PCB
+            unsigned int numInstr = 0, numIOInstr = 0;
+
+            PCB pcb(i, numInstr, numIOInstr);
+            // END Create new PCB
+        }
+
+        mdQueueCopy.pop();
+    }
 }
 
 //
