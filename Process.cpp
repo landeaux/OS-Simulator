@@ -5,6 +5,10 @@
  * 
  * @details Implements all member methods of Process class
  * 
+ * @version 1.01
+ *          Adam Landis (24 April 2019)
+ *          Remove method getPID() - made inline in header file
+ * 
  * @version 1.00
  *          Adam Landis (24 April 2019)
  *          Initial development and testing of Process class
@@ -57,13 +61,3 @@ Process& Process::operator=(const Process &rhs)
  * @brief      Destroys the object.
  */
 Process::~Process() {}
-
-/**
- * @brief      Gets the pid.
- *
- * @return     The pid.
- */
-const unsigned int Process::getPID() const
-{
-    return this->pid;
-}
