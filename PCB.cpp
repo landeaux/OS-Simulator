@@ -43,12 +43,12 @@
 /**
  * @brief      Constructs the object (default).
  */
-PCB::PCB() : pid(0), state(START), pc(0) {}
+PCB::PCB() : pid(0), pc(0), state(START) {}
 
 /**
  * @brief      Constructs the PCB object (parameterized).
  */
-PCB::PCB(unsigned int pid) : pid(pid), state(START), pc(0) {}
+PCB::PCB(unsigned int pid) : pid(pid), pc(0), state(START) {}
 
 /**
  * @brief      Copy constructor
