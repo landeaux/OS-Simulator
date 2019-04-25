@@ -5,6 +5,11 @@
  * 
  * @details Implements all member methods of Simulation class
  * 
+ * @version 1.05
+ *          Adam Landis (24 April 2019)
+ *          Implement method sortReadyQueue() and add method stubs for 
+ *          sortByPS(), sortBySJF(), and sortByFCFS()
+ * 
  * @version 1.04
  *          Adam Landis (24 April 2019)
  *          - Implement methods printReadyQueue(), printWaitQueue(), 
@@ -253,6 +258,68 @@ void Simulation::startSimulation()
     }
 
     this->config->logData("\n");
+}
+
+/**
+ * @brief      Sorts the readyQueue according to given algorithm (PS, SJF, or 
+ *             FCFS)
+ *
+ * @param[in]  algo  The scheduling algorithm
+ */
+void Simulation::sortReadyQueue(std::string algo)
+{
+    std::vector<PCB> temp;
+
+    unsigned size = this->readyQueue.size();
+
+    for (unsigned i = 0; i < size; i++)
+    {
+        temp[i] = readyQueue.front();
+        readyQueue.pop();
+    }
+
+    if (algo == "PS")
+    {
+        this->sortByPS(temp);
+    }
+    else if (algo == "SJF")
+    {
+        this->sortBySJF(temp);
+    }
+    else if (algo == "FCFS")
+    {
+        this->sortByFCFS(temp);
+    }
+}
+
+/**
+ * @brief      Sorts the readyQueue according to PS (Priority Scheduling)
+ *
+ * @param[in]  pcbVector  The pcb vector
+ */
+void Simulation::sortByPS(std::vector<PCB> pcbVector)
+{
+    
+}
+
+/**
+ * @brief      Sorts the readyQueue according to SJF (Shortest Job First)
+ *
+ * @param[in]  pcbVector  The pcb vector
+ */
+void Simulation::sortBySJF(std::vector<PCB> pcbVector)
+{
+    
+}
+
+/**
+ * @brief      Sorts the readyQueue according to FCFS (First Come First Serve)
+ *
+ * @param[in]  pcbVector  The pcb vector
+ */
+void Simulation::sortByFCFS(std::vector<PCB> pcbVector)
+{
+    
 }
 
 /**
