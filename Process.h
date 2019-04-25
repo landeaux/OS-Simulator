@@ -5,6 +5,10 @@
  * 
  * @details Specifies all member methods of the Process class
  * 
+ * @version 1.04
+ *          Adam Landis (24 April 2019)
+ *          Add overloaded stream insertion operator << method signature.
+ * 
  * @version 1.03
  *          Adam Landis (24 April 2019)
  *          Add getter method to get instrVector 
@@ -33,6 +37,7 @@
 // Header Files ////////////////////////////////////////////////////////////////
 // 
 #include <vector> // for instruction vector
+#include <iostream>
 
 #include "MetadataInstruction.h"
 //
@@ -50,6 +55,8 @@ public:
     Process(const Process &obj);
     Process& operator=(const Process &rhs);
     ~Process();
+
+    friend std::ostream & operator << (std::ostream &out, const Process &process);
 
     /************************      Setter methods     *************************/
     /**
