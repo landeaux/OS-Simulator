@@ -5,6 +5,11 @@
  * 
  * @details Specifies all member methods of the Simulation class
  * 
+ * @version 1.04
+ *          Adam Landis (24 April 2019)
+ *          Add method prototypes for sortReadyQueue(), sortByPS(), sortBySJF(), 
+ *          and sortByFCFS()
+ * 
  * @version 1.03
  *          Adam Landis (24 April 2019)
  *          Add method prototypes printReadyQueue(), printWaitQueue(), 
@@ -69,6 +74,12 @@ public:
 
     void createProcesses();
     void startSimulation();
+
+    void sortReadyQueue(std::string algo);
+    void sortByPS(std::vector<PCB> pcbVector);
+    void sortBySJF(std::vector<PCB> pcbVector);
+    void sortByFCFS(std::vector<PCB> pcbVector);
+
     void printReadyQueue();
     void printWaitQueue();
     void printQueue(std::string queueType);
