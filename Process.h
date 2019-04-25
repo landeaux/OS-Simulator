@@ -5,6 +5,10 @@
  * 
  * @details Specifies all member methods of the Process class
  * 
+ * @version 1.03
+ *          Adam Landis (24 April 2019)
+ *          Add getter method to get instrVector 
+ * 
  * @version 1.02
  *          Adam Landis (24 April 2019)
  *          - Add setter and getter methods for instrVector data member.
@@ -66,6 +70,16 @@ public:
      * @return     The pid.
      */
     inline const unsigned int getPID() const { return this->pid; }
+
+    /**
+     * @brief      Gets the instruction vector.
+     *
+     * @return     The instruction vector.
+     */
+    inline const std::vector<MetadataInstruction> getInstrVector() const
+    {
+        return this->instrVector;
+    }
 
     /**
      * @brief      Gets the instruciton from instrVector located at index idx.
