@@ -5,6 +5,10 @@
  * 
  * @details Specifies all member methods of the Metadata class
  * 
+ * @version 1.01
+ *          Adam Landis (24 April 2019)
+ *          Change signature of parseMetadataFile() to have no parameters
+ * 
  * @version 1.00
  *          Adam Landis (8 April 2019)
  *          Initial development and testing of Metadata class
@@ -38,7 +42,7 @@ public:
     Metadata(const std::string& filename, Config *config);
 
     void validateMetadataFile(std::ifstream& metadataFile);
-    void parseMetadataFile(std::ifstream& metadataFile);
+    void parseMetadataFile();
     MetadataInstruction parseMetadataInstruction(std::string& instructionStr);
     void validateMetadataCode(const char& code);
     void validateMetadataDescriptor(const std::string& descriptor);
