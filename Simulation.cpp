@@ -5,6 +5,15 @@
  * 
  * @details Implements all member methods of Simulation class
  * 
+ * @version 1.07
+ *          Adam Landis (24 April 2019)
+ *          - Change startSimulation() implementation to use readyQueue.
+ *          - Change constructor by setting sem pointers, then parsing metadata
+ *            file.
+ *          - Fix sortReadyQueue() by using push_back() for temp PCB vector 
+ *            instead of setting by subscript.
+ *          - Code cleanup.
+ * 
  * @version 1.06
  *          Adam Landis (24 April 2019)
  *          Remove unneeded methods stubs for sortByPS(), sortBySJF(), and 
@@ -77,6 +86,7 @@ Simulation::Simulation(const std::string& configFilename): configFilename(config
 
     this->metadata = new Metadata(metadataFilename, this->config);
     this->metadata->setSemPtrs(&semHD, &semProj, &semKB, &semMon, &semScan);
+    this->metadata->parseMetadataFile();
 }
 
 /**
@@ -95,8 +105,6 @@ void Simulation::createProcesses()
         if (instr.toString() == "A{begin}0")
         {
             mdQueueCopy.pop();
-
-            std::cout << "\nProcess found!\nThe instructions are...\n";
             
             // Create new Process
             unsigned int numInstr = 0, numIOInstr = 0;
@@ -108,9 +116,6 @@ void Simulation::createProcesses()
             while (instr.toString() != "A{finish}0")
             {
                 instrVector.push_back(instr);
-
-                std::cout << "\t" << instr.toString() << std::endl;
-                std::cout << "\t\t" << instr.getCode() << std::endl;
 
                 if (instr.getCode() == 'I' || instr.getCode() == 'O')
                 {
@@ -141,10 +146,6 @@ void Simulation::createProcesses()
 
         mdQueueCopy.pop();
     }
-
-    printQueue("ready");
-    printQueue("wait");
-    printProcessVector();
 }
 
 /**
@@ -152,14 +153,12 @@ void Simulation::createProcesses()
  */
 void Simulation::startSimulation()
 {
-    metadataQueue mdQueue = this->metadata->getMetadataQueue();
     Timer myTimer;
+    std::string data;
     float duration;
-    PCB* pcb;
     unsigned numHD, countHD = 0,
              numProj, countProj = 0,
-             sysMem, memBlockSize, nextBlockPtr = 0,
-             pid = 0;
+             sysMem, memBlockSize, nextBlockPtr = 0;
 
     numHD   = (unsigned) strToUnsignedLong(this->config->getSettingVal("Hard drive quantity"));
     numProj = (unsigned) strToUnsignedLong(this->config->getSettingVal("Projector quantity"));
@@ -175,76 +174,85 @@ void Simulation::startSimulation()
     sem_init(&semMon,  0, 1);
     sem_init(&semScan, 0, 1);
 
+    createProcesses();
+
+    std::string schedCode = this->config->getSettingVal("CPU Scheduling Code");
+    sortReadyQueue(schedCode);
+
     std::cout << std::setprecision(6) << std::fixed;
 
     myTimer.startTimer();
 
-    while (!mdQueue.empty())
+    duration = myTimer.getDuration() / 1000.0f;
+    data = std::to_string(duration) + " - Simulator program starting\n";
+    this->config->logData(data);
+
+    while (!readyQueue.empty())
     {
-        MetadataInstruction instr = mdQueue.front();
-        char code = instr.getCode();
-        std::string descriptor = instr.getDescriptor();
-        float wait_time = instr.getWaitTime();
-        unsigned memAddr;
-        std::string data;
-        
-        if (code == 'A' && descriptor == "begin")
-        {
-            pcb = new PCB(++pid, 0, 0);
-            pcb->setState(START);
-        }
-        else if (code == 'P')
-        {
-            pcb->setState(RUNNING);
-        }
-
         duration = myTimer.getDuration() / 1000.0f;
-        data = std::to_string(duration) + " - " + instr.genLogString(true, pid);
+        
+        PCB tempPCB = readyQueue.front();
+        unsigned pid = tempPCB.getPID();
 
-        if (descriptor == "hard drive")
-        {
-            data += std::to_string(countHD++ % numHD);
-        }
-        else if (descriptor == "projector")
-        {
-            data += std::to_string(countProj++ % numProj);
-        }
-
-        data += "\n";
-
+        data  = std::to_string(duration) + " - OS: preparing process ";
+        data += std::to_string(pid) + "\n";
         this->config->logData(data);
 
-        if (code == 'I' || code == 'O')
-        {
-            pcb->setState(WAIT);
+        duration = myTimer.getDuration() / 1000.0f;
+        data  = std::to_string(duration) + " - OS: starting process ";
+        data += std::to_string(pid) + "\n";
+        this->config->logData(data);
 
-            pthread_t tid;
-            // pthread_create(&tid, NULL, executeIOInstruction, (void*)&instr);
-            pthread_create(&tid, NULL, wait, (void*)&wait_time);
-            pthread_join(tid, NULL);
-        }
-        else if (code == 'M')
-        {
-            executeMemInstruction(instr, nextBlockPtr, memBlockSize, memAddr, sysMem);
-        }
-        else
-        {
-            wait(wait_time);
-        }
+        std::vector<MetadataInstruction> instrVector = processVector[pid-1].getInstrVector();
 
-        if (code == 'A' && descriptor == "finish")
+        for (unsigned i = 0; i < instrVector.size(); i++)
         {
-            pcb->setState(EXIT);
-            delete pcb;
-        }
-        else if (code != 'S')
-        {
-            pcb->setState(READY);
-        }
+            MetadataInstruction instr = instrVector[i];
+            char code = instr.getCode();
+            std::string descriptor = instr.getDescriptor();
+            float wait_time = instr.getWaitTime();
+            unsigned memAddr;
+            std::string data;
+            
+            if (code == 'P')
+            {
+                tempPCB.setState(RUNNING);
+            }
 
-        if (   code != 'S' && 
-             !(code == 'A' && descriptor == "finish") )
-        {
+            duration = myTimer.getDuration() / 1000.0f;
+            data = std::to_string(duration) + " - " + instr.genLogString(true, pid);
+
+            if (descriptor == "hard drive")
+            {
+                data += std::to_string(countHD++ % numHD);
+            }
+            else if (descriptor == "projector")
+            {
+                data += std::to_string(countProj++ % numProj);
+            }
+
+            data += "\n";
+
+            this->config->logData(data);
+
+            if (code == 'I' || code == 'O')
+            {
+                tempPCB.setState(WAIT);
+
+                pthread_t tid;
+                pthread_create(&tid, NULL, executeIOInstruction, (void*)&instr);
+                pthread_join(tid, NULL);
+            }
+            else if (code == 'M')
+            {
+                executeMemInstruction(instr, nextBlockPtr, memBlockSize, memAddr, sysMem);
+            }
+            else
+            {
+                wait(wait_time);
+            }
+
+
             duration = myTimer.getDuration() / 1000.0f;
             data = std::to_string(duration) + " - " + instr.genLogString(false, pid);
 
@@ -259,10 +267,17 @@ void Simulation::startSimulation()
             this->config->logData(data);
         }
 
-        mdQueue.pop();
+        duration = myTimer.getDuration() / 1000.0f;
+        data  = std::to_string(duration) + " - End process ";
+        data += std::to_string(pid) + "\n";
+        this->config->logData(data);
+
+        readyQueue.pop();
     }
 
-    this->config->logData("\n");
+    duration = myTimer.getDuration() / 1000.0f;
+    data = std::to_string(duration) + " - Simulator program ending\n\n";
+    this->config->logData(data);
 }
 
 /**
@@ -275,11 +290,11 @@ void Simulation::sortReadyQueue(std::string algo)
 {
     std::vector<PCB> temp;
 
-    unsigned size = this->readyQueue.size();
+    unsigned size = readyQueue.size();
 
     for (unsigned i = 0; i < size; i++)
     {
-        temp[i] = readyQueue.front();
+        temp.push_back(readyQueue.front());
         readyQueue.pop();
     }
 
@@ -455,7 +470,6 @@ void* executeIOInstruction(void* param)
 {
     MetadataInstruction instr = *((MetadataInstruction*)param);
     sem_t *semPtr;
-    std::string descriptor = instr.getDescriptor();
 
     semPtr = instr.getSemPtr();
 
