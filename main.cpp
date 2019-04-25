@@ -7,6 +7,10 @@
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 4.00
+ *          Adam Landis (24 April 2019)
+ *          Add call to Simulation::createProcesses()
+ * 
  * @version 3.06
  *          Adam Landis (8 April 2019)
  *          - Move all Metadata-related instructions and data into Metadata.h
@@ -141,6 +145,8 @@ int main(int argc, char *argv[])
         std::string configFilename = argv[1];
 
         Simulation mySim(configFilename);
+
+        mySim.createProcesses();
 
         mySim.startSimulation();
     }
