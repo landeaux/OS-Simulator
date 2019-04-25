@@ -5,6 +5,12 @@
  * 
  * @details Specifies all member methods of the Simulation class
  * 
+ * @version 1.03
+ *          Adam Landis (24 April 2019)
+ *          Add method prototypes printReadyQueue(), printWaitQueue(), 
+ *          printQueue(std::string), and printProcessVector() to print the 
+ *          contents of readyQueue, waitQueue, and processVector, respectively
+ * 
  * @version 1.02
  *          Adam Landis (24 April 2019)
  *          Add method prototype createProcesses()
@@ -61,8 +67,12 @@ class Simulation
 public:
     Simulation(const std::string& configFilename);
 
-    void startSimulation();
     void createProcesses();
+    void startSimulation();
+    void printReadyQueue();
+    void printWaitQueue();
+    void printQueue(std::string queueType);
+    void printProcessVector();
 private:
     std::string configFilename;
     Config *config;
