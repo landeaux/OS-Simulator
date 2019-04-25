@@ -5,6 +5,11 @@
  * 
  * @details Implements all member methods of Process class
  * 
+ * @version 1.02
+ * 			Adam Landis (24 April 2019)
+ * 			Update copy constructor and overloaded assignment operator to copy
+ * 			data member instrVector.
+ * 
  * @version 1.01
  *          Adam Landis (24 April 2019)
  *          Remove method getPID() - made inline in header file
@@ -41,6 +46,7 @@ Process::Process(unsigned int pid) : pid(pid) {}
 Process::Process(const Process &obj)
 {
     this->pid = obj.pid;
+    this->instrVector = obj.instrVector;
 }
 
 /**
@@ -53,6 +59,7 @@ Process::Process(const Process &obj)
 Process& Process::operator=(const Process &rhs)
 {
     this->pid = rhs.pid;
+    this->instrVector = rhs.instrVector;
 
     return *this;
 }
