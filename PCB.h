@@ -5,6 +5,21 @@
  * 
  * @details Specifies all member methods of the PCB class
  * 
+ * @version 1.04
+ *          Adam Landis (24 April 2019)
+ *          - Add data members numInstr and numIOInstr along with their setters 
+ *            and getters
+ *          - Make all setters and getters inline
+ *          - Change parameterized constructor signature to include numInstr and
+ *            numIOInstr
+ * 
+ * @version 1.03
+ *          Adam Landis (24 April 2019)
+ *          - Change name of setProgramCounter() and getProgramCounter() to 
+ *            setPC() and getPC()
+ *          - Add copy constructor, overloaded assignement operator, and 
+ *            destructor
+ * 
  * @version 1.02
  *          Adam Landis (14 March 2019)
  *          - Add data member pc.
@@ -43,15 +58,67 @@ class PCB
 {
 public:
     PCB();
-    PCB(unsigned int pid);
-    void setState(State state);
-    void setProgramCounter(unsigned int pc);
-    const State getState() const;
-    const unsigned int getPID() const;
-    const unsigned int getProgramCounter() const;
+    PCB(unsigned int pid, unsigned int numInstr, unsigned int numIOInstr);
+    PCB(const PCB &obj);
+    PCB& operator=(const PCB &rhs);
+    ~PCB();
+
+    /************************      Setter methods     *************************/
+    /**
+     * @brief      Sets the pc.
+     *
+     * @param[in]  pc    The program counter value to set
+     */
+    inline void setPC(unsigned int pc) { this->pc = pc; }
+
+    /**
+     * @brief      Sets the state.
+     *
+     * @param[in]  state  The state value to set
+     */
+    inline void setState(State state) { this->state = state; }
+
+    /**************************************************************************/
+
+    /************************      Getter methods     *************************/
+    /**
+     * @brief      Gets the pid.
+     *
+     * @return     The pid.
+     */
+    inline const unsigned int getPID() const { return this->pid; }
+
+    /**
+     * @brief      Gets the program counter (pc).
+     *
+     * @return     The program counter (pc).
+     */
+    inline const unsigned int getPC() const { return this->pc; }
+
+    /**
+     * @brief      Gets the number of instructions.
+     *
+     * @return     The number of instrucitons.
+     */
+    inline const unsigned int getNumInstr() const { return this->numInstr; }
+
+    /**
+     * @brief      Gets the number IO instructions.
+     *
+     * @return     The number of IO instructions.
+     */
+    inline const unsigned int getNumIOInstr() const { return this->numIOInstr; }
+
+    /**
+     * @brief      Gets the state.
+     *
+     * @return     The state.
+     */
+    inline const State getState() const { return this->state; }
+
+    /**************************************************************************/
 private:
-    unsigned int pid;
-    unsigned int pc;
+    unsigned int pid, pc, numInstr, numIOInstr;
     State state;
 };
 //

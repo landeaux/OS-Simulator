@@ -5,6 +5,24 @@
  * 
  * @details Implements all member methods of MetadataInstruction class
  * 
+ * @version 1.05
+ *          Adam Landis (7 April 2019)
+ *          Update genLogString() for hard drive and projector output
+ * 
+ * @version 1.04
+ *          Adam Landis (7 April 2019)
+ *          - Implement setter/getter funcs for new data member semPtr
+ *          - Change constructors and overloaded assignment operator to 
+ *            instantiate/copy semPtr
+ * 
+ * @version 1.03
+ *          Adam Landis (6 April 2019)
+ *          - Add overloaded assignment operator implementation
+ *          - Implement setWaitTime() and getWaitTime() methods
+ *          - Change implementation of copy constructor to copy new
+ *            data member waitTime
+ *          - Change implementation of constructor to set default waitTime
+ * 
  * @version 1.02
  *          Adam Landis
  *          Add genLogString() method implementation
@@ -41,6 +59,8 @@ MetadataInstruction::MetadataInstruction(char code,
     this->code = code;
     this->descriptor = descriptor;
     this->numCycles = numCycles;
+    this->waitTime = 0.0;
+    this->semPtr = NULL;
 }
 
 /**
@@ -53,12 +73,72 @@ MetadataInstruction::MetadataInstruction(const MetadataInstruction &obj)
     this->code = obj.code;
     this->descriptor = obj.descriptor;
     this->numCycles = obj.numCycles;
+    this->waitTime = obj.waitTime;
+    this->semPtr = obj.semPtr;
+}
+
+/**
+ * @brief      Overloaded Assignment Operator
+ *
+ * @param[in]  rhs   The right hand side
+ *
+ * @return     { description_of_the_return_value }
+ */
+MetadataInstruction& MetadataInstruction::operator=(const MetadataInstruction &rhs)
+{
+    this->code = rhs.code;
+    this->descriptor = rhs.descriptor;
+    this->numCycles = rhs.numCycles;
+    this->waitTime = rhs.waitTime;
+    this->semPtr = rhs.semPtr;
+
+    return *this;
 }
 
 /**
  * @brief      Destroys the object.
  */
 MetadataInstruction::~MetadataInstruction() {}
+
+/**
+ * @brief      Sets the wait time.
+ *
+ * @param[in]  cycleTime  The cycle time (unsigned long)
+ */
+void MetadataInstruction::setWaitTime(unsigned long cycleTime)
+{
+    this->waitTime = (float)(this->numCycles * cycleTime);
+}
+
+/**
+ * @brief      Sets the semaphore pointer.
+ *
+ * @param      sem   The semaphore pointer
+ */
+void MetadataInstruction::setSemPtr(sem_t *semPtr)
+{
+    this->semPtr = semPtr;
+}
+
+/**
+ * @brief      Gets the wait time.
+ *
+ * @return     The wait time.
+ */
+const float MetadataInstruction::getWaitTime() const
+{
+    return this->waitTime;
+}
+
+/**
+ * @brief      Gets the semaphore pointer.
+ *
+ * @return     The semaphore pointer.
+ */
+sem_t *MetadataInstruction::getSemPtr()
+{
+    return this->semPtr;
+}
 
 /**
  * @brief      Gets the code.
@@ -108,6 +188,14 @@ const std::string MetadataInstruction::toString() const
     return result;
 }
 
+/**
+ * @brief      Generate a string for logging purposes
+ *
+ * @param[in]  isStart  Indicates if start
+ * @param[in]  pid      The pid
+ *
+ * @return     The generated log string
+ */
 const std::string MetadataInstruction::genLogString(bool isStart, unsigned pid)
 {
     std::string result;
@@ -150,7 +238,6 @@ const std::string MetadataInstruction::genLogString(bool isStart, unsigned pid)
         }
         else
         {
-            
             result += isStart ? "start" : "end";
             
             if (this->code == 'P')
@@ -164,11 +251,22 @@ const std::string MetadataInstruction::genLogString(bool isStart, unsigned pid)
                 if (this->code == 'I' || this->code == 'O')
                 {
                     result += (this->code == 'I') ? "input" : "output";
+
+                    if (isStart)
+                    {
+                        if (this->descriptor == "hard drive")
+                        {
+                            result += " on HDD ";
+                        }
+                        else if (this->descriptor == "projector")
+                        {
+                            result += " on PROJ ";
+                        }
+                    }
                 }
             }
         }
     }
-        
 
     return result;
 }
