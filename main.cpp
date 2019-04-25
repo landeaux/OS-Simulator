@@ -7,6 +7,10 @@
  *
  * @details This program is the driver program for OS Simulator classes
  * 
+ * @version 4.01
+ *          Adam Landis (24 April 2019)
+ *          Remove call to Simulation::createProcesses()
+ * 
  * @version 4.00
  *          Adam Landis (24 April 2019)
  *          Add call to Simulation::createProcesses()
@@ -145,8 +149,6 @@ int main(int argc, char *argv[])
         std::string configFilename = argv[1];
 
         Simulation mySim(configFilename);
-
-        mySim.createProcesses();
 
         mySim.startSimulation();
     }
