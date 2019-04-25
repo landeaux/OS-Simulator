@@ -5,6 +5,11 @@
  * 
  * @details Specifies all member methods of the Simulation class
  * 
+ * @version 1.05
+ *          Adam Landis (24 April 2019)
+ *          Remove method prototypes for sortByPS(), sortBySJF(), and 
+ *          sortByFCFS() -- not needed.
+ * 
  * @version 1.04
  *          Adam Landis (24 April 2019)
  *          Add method prototypes for sortReadyQueue(), sortByPS(), sortBySJF(), 
@@ -44,6 +49,7 @@
 #include <semaphore.h>  // for semaphores
 #include <queue>        // for ready and wait queues
 #include <vector>       // for vector of processes
+#include <algorithm>    // std::sort
 
 #include "helpers.h"
 #include "Config.h"
@@ -65,6 +71,32 @@ void executeMemInstruction(
     unsigned sysMem);
 void* executeIOInstruction(void* param);
 //
+// Struct Definitions //////////////////////////////////////////////////////////
+//
+struct by_largestNumIOInstr
+{
+    bool operator()(PCB const &lhsPCB, PCB const &rhsPCB) const
+    {
+        return lhsPCB.getNumIOInstr() > rhsPCB.getNumIOInstr();
+    }
+};
+
+struct by_smallestNumInstr
+{
+    bool operator()(PCB const &lhsPCB, PCB const &rhsPCB) const
+    {
+        return lhsPCB.getNumInstr() < rhsPCB.getNumInstr();
+    }
+};
+
+struct by_smallestPID
+{
+    bool operator()(PCB const &lhsPCB, PCB const &rhsPCB) const
+    {
+        return lhsPCB.getPID() < rhsPCB.getPID();
+    }
+};
+//
 // Class Definition ////////////////////////////////////////////////////////////
 // 
 class Simulation
@@ -76,9 +108,6 @@ public:
     void startSimulation();
 
     void sortReadyQueue(std::string algo);
-    void sortByPS(std::vector<PCB> pcbVector);
-    void sortBySJF(std::vector<PCB> pcbVector);
-    void sortByFCFS(std::vector<PCB> pcbVector);
 
     void printReadyQueue();
     void printWaitQueue();
