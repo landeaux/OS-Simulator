@@ -5,6 +5,14 @@
  * 
  * @details Implements all member methods of Simulation class
  * 
+ * @version 1.04
+ *          Adam Landis (24 April 2019)
+ *          - Implement methods printReadyQueue(), printWaitQueue(), 
+ *            printQueue(std::string), and printProcessVector() to print the 
+ *            contents of readyQueue, waitQueue, and processVector, respectively
+ *          - Add calls to end of createProcesses() to printQueue() and 
+ *            printProcessVector()
+ *           
  * @version 1.03
  *          Adam Landis (24 April 2019)
  *          Add code to createProcesses() to count numInstr and numIOInstr and 
@@ -59,6 +67,74 @@ Simulation::Simulation(const std::string& configFilename): configFilename(config
 
     this->metadata = new Metadata(metadataFilename, this->config);
     this->metadata->setSemPtrs(&semHD, &semProj, &semKB, &semMon, &semScan);
+}
+
+/**
+ * @brief      Creates processes for each process in metadata, along with its 
+ *             PCB.
+ */     
+void Simulation::createProcesses()
+{
+    int i = 1;
+    metadataQueue mdQueueCopy = this->metadata->getMetadataQueue();
+
+    while (!mdQueueCopy.empty())
+    {
+        MetadataInstruction instr = mdQueueCopy.front();
+        
+        if (instr.toString() == "A{begin}0")
+        {
+            mdQueueCopy.pop();
+
+            std::cout << "\nProcess found!\nThe instructions are...\n";
+            
+            // Create new Process
+            unsigned int numInstr = 0, numIOInstr = 0;
+            Process process(i);
+            std::vector<MetadataInstruction> instrVector;
+
+            instr = mdQueueCopy.front();
+
+            while (instr.toString() != "A{finish}0")
+            {
+                instrVector.push_back(instr);
+
+                std::cout << "\t" << instr.toString() << std::endl;
+                std::cout << "\t\t" << instr.getCode() << std::endl;
+
+                if (instr.getCode() == 'I' || instr.getCode() == 'O')
+                {
+                    numIOInstr++;
+                    numInstr++;
+                }
+                else
+                {
+                    numInstr++;
+                }
+
+                mdQueueCopy.pop();
+                instr = mdQueueCopy.front();
+            }
+            process.setInstrVector(instrVector);
+            // END Create new Process
+
+            this->processVector.push_back(process);
+
+            // Create new PCB
+            PCB pcb(i, numInstr, numIOInstr);
+            // END Create new PCB
+
+            pcb.setState(READY);
+            this->readyQueue.push(pcb);
+            i++;
+        }
+
+        mdQueueCopy.pop();
+    }
+
+    printQueue("ready");
+    printQueue("wait");
+    printProcessVector();
 }
 
 /**
@@ -179,84 +255,11 @@ void Simulation::startSimulation()
     this->config->logData("\n");
 }
 
-void Simulation::createProcesses()
+/**
+ * @brief      Prints the contents of readyQueue
+ */
+void Simulation::printReadyQueue()
 {
-    int i = 1;
-    metadataQueue mdQueueCopy = this->metadata->getMetadataQueue();
-
-    while (!mdQueueCopy.empty())
-    {
-        MetadataInstruction instr = mdQueueCopy.front();
-        
-        if (instr.toString() == "A{begin}0")
-        {
-            mdQueueCopy.pop();
-
-            std::cout << "\nProcess found!\nThe instructions are...\n";
-            
-            // Create new Process
-            unsigned int numInstr = 0, numIOInstr = 0;
-            Process process(i);
-            std::vector<MetadataInstruction> instrVector;
-
-            instr = mdQueueCopy.front();
-
-            while (instr.toString() != "A{finish}0")
-            {
-                instrVector.push_back(instr);
-
-                std::cout << "\t" << instr.toString() << std::endl;
-                std::cout << "\t\t" << instr.getCode() << std::endl;
-
-                if (instr.getCode() == 'I' || instr.getCode() == 'O')
-                {   
-                    std::cout << "entered if statement" << std::endl;
-                    numIOInstr++;
-                    numInstr++;
-                }
-                else
-                {
-                    numInstr++;
-                }
-
-                mdQueueCopy.pop();
-                instr = mdQueueCopy.front();
-            }
-            process.setInstrVector(instrVector);
-            // END Create new Process
-
-            this->processVector.push_back(process);
-
-            // Create new PCB
-            PCB pcb(i, numInstr, numIOInstr);
-            // END Create new PCB
-
-            pcb.setState(READY);
-            this->readyQueue.push(pcb);
-            i++;
-        }
-
-        mdQueueCopy.pop();
-    }
-
-    std::cout << "\nListing the contents of processVector...\n\n";
-    for (unsigned k = 0; k < this->processVector.size(); k++)
-    {
-        Process tempProcess = processVector[k];
-
-        std::cout << "tempProcess.getPID() = " << tempProcess.getPID() << std::endl;
-
-        std::vector<MetadataInstruction> tempInstrVector = tempProcess.getInstrVector();
-
-        for (unsigned l = 0; l < tempInstrVector.size(); l++)
-        {
-            std::cout << "\t" << tempInstrVector[l].toString() << std::endl;
-        }
-
-        std::cout << std::endl;
-    }
-
-    std::cout << "\nListing the contents of readyQueue...\n\n";
     std::queue<PCB> readyQueueCopy = this->readyQueue;
     while (!readyQueue.empty())
     {
@@ -265,6 +268,55 @@ void Simulation::createProcesses()
         std::cout << tempPCB << std::endl;
 
         readyQueue.pop();
+    }
+}
+
+/**
+ * @brief      Prints the contents of waitQueue
+ */
+void Simulation::printWaitQueue()
+{
+    std::queue<PCB> readyQueueCopy = this->readyQueue;
+    while (!readyQueue.empty())
+    {
+        PCB tempPCB = this->readyQueue.front();
+
+        std::cout << tempPCB << std::endl;
+
+        readyQueue.pop();
+    }
+}
+
+/**
+ * @brief      Prints the contents of the specified queue ("wait" or "ready")
+ *
+ * @param[in]  queueType  The queue type
+ */
+void Simulation::printQueue(std::string queueType)
+{
+    std::cout << "\nPrinting the contents of " << queueType << "queue...\n\n";
+
+    if (queueType == "ready")
+    {
+        this->printReadyQueue();
+    }
+    else if (queueType == "wait")
+    {
+        this->printWaitQueue();
+    }
+}
+
+/**
+ * @brief      Prints the contents of processVector
+ */
+void Simulation::printProcessVector()
+{
+    std::cout << "\nPrinting the contents of processVector...\n\n";
+    for (unsigned k = 0; k < this->processVector.size(); k++)
+    {
+        Process tempProcess = processVector[k];
+
+        std::cout << tempProcess << std::endl;
     }
 }
 
