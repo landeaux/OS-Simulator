@@ -25,12 +25,11 @@
  *
  * @param[in]  filename  The metadata filename
  */
-Metadata::Metadata(const std::string& filename, Config *config): filename(filename), config(config)
+Metadata::Metadata(const std::string& filename, Config *config) : filename(filename), config(config)
 {
     std::ifstream metadataFile(filename.c_str(), std::ios::in);
 
     validateMetadataFile(metadataFile);
-    parseMetadataFile(metadataFile);
 
     metadataFile.close();
 }
@@ -71,16 +70,17 @@ void Metadata::validateMetadataFile(std::ifstream& metadataFile)
 /**
  * Parses the contents of a metadata file
  *
- * @param   metadataFile
- *          The metadata file to parse
- *
  * @return  a queue containing metadata instructions
  */
-void Metadata::parseMetadataFile(std::ifstream& metadataFile)
+void Metadata::parseMetadataFile()
 {
+    std::ifstream metadataFile(filename.c_str(), std::ios::in);
+
     std::string tempLine;
     std::string tempInstr;
     bool isLastLine = false;
+
+    getline(metadataFile, tempLine); // Ignore header
 
     while (!metadataFile.eof() && tempLine != METADATA_FOOTER && ! isLastLine)
     {
@@ -146,6 +146,8 @@ void Metadata::parseMetadataFile(std::ifstream& metadataFile)
             } while (end != std::string::npos && start < tempLine.length());
         }
     }
+
+    metadataFile.close();
 }
 
 /**
