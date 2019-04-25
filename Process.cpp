@@ -5,6 +5,10 @@
  * 
  * @details Implements all member methods of Process class
  * 
+ * @version 1.03
+ *          Adam Landis (24 April 2019)
+ *          Implement overloaded stream insertion operator << method              
+ * 
  * @version 1.02
  * 			Adam Landis (24 April 2019)
  * 			Update copy constructor and overloaded assignment operator to copy
@@ -68,3 +72,24 @@ Process& Process::operator=(const Process &rhs)
  * @brief      Destroys the object.
  */
 Process::~Process() {}
+
+/**
+ * @brief      Overloaded stream insertion operator for output
+ *
+ * @param      out       The output
+ * @param[in]  process   The process
+ * 
+ * @return     The output
+ */
+std::ostream & operator << (std::ostream &out, const Process &process)
+{
+    out << "PID: " << process.pid << std::endl;
+    out << "Instructions:\n";
+
+    for (unsigned i = 0; i < process.instrVector.size(); i++)
+    {
+        out << "\t" << process.instrVector[i].toString() << std::endl;
+    }
+
+    return out;
+}
