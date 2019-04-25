@@ -5,6 +5,11 @@
  * 
  * @details Implements all member methods of Metadata class
  * 
+ * @version 1.01
+ *          Adam Landis (24 April 2019)
+ *          Change signature of parseMetadataFile() to have no parameters and 
+ *          open file from datamember filename
+ * 
  * @version 1.00
  *          Adam Landis (8 March 2019)
  *          Initial development and testing of Metadata class
