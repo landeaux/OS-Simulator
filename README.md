@@ -16,14 +16,6 @@ To run the program, use the following command from the program directory, and in
 ./sim3 <filename>
 ```
 
-## Mutex and Semaphores
+## CPU Scheduling Algorithms
 
-Version 3.0 introduces the use of pthread mutex and semaphores for mutual exclusion and resource management. All mutex and semaphore statements can be found in __Simulation.cpp__. The mutex is defined on __line 21__, initialized on __line 67__, and the mutex lock and unlock statements are found on __lines 217 and 239__, respectively. The semaphores are defined on __line 22__, initialized on __lines 69 - 73__, and the sem_wait() and sem_post() calls are made on __lines 257 and 261__, respectively.
-
-## Pthreads
-
-Version 2.0 of the OS-Simulator introduces pthreads for a threaded wait() timer function. The location for created threads is in __Simulation.cpp__ at __line 129__ of the Simulation::startSimulation() function.
-
-## PCB (Process Control Block)
-
-Version 2.0 of the OS-Simulator also introduces the use of a PCB object to simulate a process control block. The class specification and implementation can be found in __PCB.h__ and __PCB.cpp__, respectively. A PCB* object is defined in __Simulation.cpp__ at the beginning of the __Simulation::startSimulation()__ function (__line 55__) and allocated a new PCB object when a new process is created (__line 90__).
+This version of the OS Simulator introduces CPU Scheduling algorithms. These algorithm can be found in __Simulation.cpp__ in the function __Simulation::sortReadyQueue__ on __line 398__.
