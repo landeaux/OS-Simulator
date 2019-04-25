@@ -5,6 +5,11 @@
  * 
  * @details Implements all member methods of PCB class
  * 
+ * @version 1.05
+ *          - Update copy contructor and overloaded assignment operator to copy
+ *            numInstr and numIOInstr data member values
+ *          - Implement overloaded stream insertion operator << method
+ * 
  * @version 1.04
  *          Adam Landis (24 April 2019)
  *          - Remove all setters and getters - made them inline
@@ -72,6 +77,8 @@ PCB::PCB(const PCB &obj)
     this->pid = obj.pid;
     this->pc = obj.pc;
     this->state = obj.state;
+    this->numInstr = obj.numInstr;
+    this->numIOInstr = obj.numIOInstr;
 }
 
 /**
@@ -86,6 +93,8 @@ PCB& PCB::operator=(const PCB &rhs)
     this->pid = rhs.pid;
     this->pc = rhs.pc;
     this->state = rhs.state;
+    this->numInstr = rhs.numInstr;
+    this->numIOInstr = rhs.numIOInstr;
 
     return *this;
 }
@@ -94,3 +103,22 @@ PCB& PCB::operator=(const PCB &rhs)
  * @brief      Destroys the object.
  */
 PCB::~PCB() {}
+
+/**
+ * @brief      Overloaded stream insertion operator for output
+ *
+ * @param      out   The output stream
+ * @param[in]  pcb   The pcb
+ *
+ * @return     The output stream
+ */
+std::ostream & operator << (std::ostream &out, const PCB &pcb)
+{
+    out << "PID: " << pcb.pid << std::endl;
+    out << "PC: " << pcb.pc << std::endl;
+    out << "State: " << pcb.state << std::endl;
+    out << "NumInstr: " << pcb.numInstr << std::endl;
+    out << "NumIOInstr: " << pcb.numIOInstr << std::endl;
+
+    return out;
+}

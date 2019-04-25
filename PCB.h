@@ -5,6 +5,10 @@
  * 
  * @details Specifies all member methods of the PCB class
  * 
+ * @version 1.05
+ *          Adam Landis (24 April 2019)
+ *          Add overloaded stream insertion operator << method signature.
+ * 
  * @version 1.04
  *          Adam Landis (24 April 2019)
  *          - Add data members numInstr and numIOInstr along with their setters 
@@ -47,6 +51,7 @@
 // Header Files ////////////////////////////////////////////////////////////////
 // 
 #include <string>
+#include <iostream>
 //
 // Global Constant Definitions /////////////////////////////////////////////////
 // 
@@ -62,6 +67,8 @@ public:
     PCB(const PCB &obj);
     PCB& operator=(const PCB &rhs);
     ~PCB();
+
+    friend std::ostream & operator << (std::ostream &out, const PCB &pcb);
 
     /************************      Setter methods     *************************/
     /**
